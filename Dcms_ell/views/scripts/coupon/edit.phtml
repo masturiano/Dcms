@@ -1,0 +1,408 @@
+<?php
+echo $this->headLink()->prependStylesheet('/assets/css/coupon.css');
+echo $this->headLink()->prependStylesheet('/assets/css/jquery/jcarousel-skin-tango.css');
+//echo $this->form->getDisplayGroup('coupons1'); 
+$code = $this->form->getElement('code');
+$type = $this->form->getElement('type');
+$discountVal = $this->form->getElement('discountVal');
+$amountQualifier = $this->form->getElement('amountQualifier');
+$ceilingAmount = $this->form->getElement('ceilingAmount');
+$hidden = $this->form->getElement('last_coupon_field_id');
+$publish = $this->form->getElement('publish');
+$from = $this->form->getElement('from');
+$to = $this->form->getElement('to');
+$from_min = $this->form->getElement('from_min');
+$to_min = $this->form->getElement('to_min');
+$startday = $this->form->getElement('startday');
+$endday = $this->form->getElement('endday');
+$firstXUsers = $this->form->getElement('valid_first_x_users');
+$free_shipping = $this->form->getElement('free_shipping');
+$couponAppliesTo = $this->form->getElement('couponAppliesTo');
+$code_checker = $this->form->getElement('code_checker');
+$code_live = $this->form->getElement('code_live');
+?>
+<script type="text/javascript">
+    if(typeof String.prototype.trim !== 'function') {   String.prototype.trim = function() {     return this.replace(/^\s+|\s+$/g, '');    } }
+    var coupon = {};
+    coupon.id = "<?php echo $code->getId(); ?>";
+    coupon.label = "<?php echo $code->getLabel(); ?>";
+    coupon.value = "<?php echo $code->getValue(); ?>";
+       
+    var ceilingAmount = {};
+    ceilingAmount.id = "<?php echo $ceilingAmount->getId(); ?>";
+    ceilingAmount.label = "<?php echo $ceilingAmount->getLabel(); ?>";
+       
+    var discountVal = {};
+    discountVal.id = "<?php echo $discountVal->getId(); ?>";
+    discountVal.label = "<?php echo $discountVal->getLabel(); ?>";
+    
+    var type = {};
+    type.id = "<?php echo $type->getId(); ?>";
+    type.label = "<?php echo $type->getLabel(); ?>";
+    
+    var amountQualifier = {};
+    amountQualifier.id = "<?php echo $amountQualifier->getId(); ?>";
+    amountQualifier.label = "<?php echo $amountQualifier->getLabel(); ?>";
+    
+    var from = {};
+    from.id = "<?php echo $from->getId(); ?>";
+    from.label = "<?php echo $from->getLabel(); ?>";
+
+    var to = {};
+    to.id = "<?php echo $to->getId(); ?>";
+    to.label = "<?php echo $to->getLabel(); ?>";
+    
+    var from_min = {};
+    from_min.id = "<?php echo $from_min->getId(); ?>";
+    from_min.label = "<?php echo $from_min->getLabel(); ?>";
+
+    var to_min = {};
+    to_min.id = "<?php echo $to_min->getId(); ?>";
+    to_min.label = "<?php echo $to_min->getLabel(); ?>";
+
+    
+    var startday = {};
+    startday.id = "<?php echo $startday->getId(); ?>";
+    startday.label = "Start Day";
+    
+    var endday = {};
+    endday.id = "<?php echo $endday->getId(); ?>";
+    endday.label = "End Day";
+    
+    var nusers = {};
+    nusers.id = "<?php echo $firstXUsers->getId(); ?>";
+    nusers.label = "Number of users";
+
+    var free_shipping = {};
+    free_shipping.id = "<?php echo $free_shipping->getId(); ?>";
+    free_shipping.label = "Free Shipping";
+    free_shipping.value = "FREESHIPPING";
+  
+    var couponAppliesTo = {};
+    couponAppliesTo.id = "<?php echo $couponAppliesTo->getId(); ?>";
+    couponAppliesTo.label = "couponAppliesTo";
+
+    var expirationType = "<?php echo $this->expiration; ?>";
+
+    var checkIfCouponExist = false;
+    $(document).ready(function() {
+      
+        var dates = $( "#"+from.id+", #"+to.id ).datepicker({
+            defaultDate: "today",
+            changeMonth: true,
+            numberOfMonths: 1,
+            dateFormat: 'mm/dd/yy',
+            minDate: new Date(), 
+            //            maxDate: new Date(2012,6, 27),
+            onSelect: function( selectedDate ) {
+                var option = this.id == "from" ? "minDate" : "maxDate",
+                instance = $( this ).data( "datepicker" ),
+                date = $.datepicker.parseDate(
+                instance.settings.dateFormat ||
+                    $.datepicker._defaults.dateFormat,
+                selectedDate, instance.settings );
+                dates.not( this ).datepicker( "option", option, date );
+                
+            }
+        });
+        
+	
+        $("#"+from_min.id+", #"+to_min.id ).timepicker({
+            showDate:false,
+            ampm: true
+        });
+	
+    if(document.getElementById('applyrestriction_checkbox').checked){
+        disableRestriction(false)
+        document.getElementById("viewTemplate").style.display = "block";
+    }
+        toggleExpiration(expirationType);
+        
+        $("#"+couponAppliesTo.id).change(function(){
+            if ($("#"+free_shipping.id).is(":checked")) {
+                $("#"+couponAppliesTo.id).val(free_shipping.value); 
+                $("#"+applyrestriction_checkbox.id).attr("disabled", true);
+                disableRestriction(true)
+                
+                
+            }else{
+                if(this.value == "ORDERTOTAL" || this.value == "SHIPPING"){
+                    document.getElementById("viewTemplate").style.display = "none";
+                    $("#"+applyrestriction_checkbox.id).attr("disabled", true);
+                    disableRestriction(true)
+                }else{
+                    activate_restriction_opts(document.getElementById('applyrestriction_checkbox'), 'restrictions');
+                    $("#"+applyrestriction_checkbox.id).attr("disabled", false);
+                }   
+            }   
+            
+        });
+		/*
+        $("#"+coupon.id).blur(function(){
+			var saveBtn = false;
+				$("#save").click(function() {
+					saveBtn = true
+				});
+				
+				if(saveBtn == false){
+					if(coupon.value != this.value)
+					hasCoupon();
+				}
+				
+
+        });*/
+    });
+        
+   
+
+ 
+
+</script>
+<?php
+$key = rand(0, 9999);
+$this->headScript()->appendFile("/assets/js/function.js?q=" . $key);
+$this->headScript()->appendFile("/assets/js/jquery/functions.js?q=" . $key);
+$this->headScript()->appendFile("/assets/js/jquery/jquery.jcarousel.min.js?q=" . $key);
+?>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <div id="main">
+            <?php echo $this->title; ?> > <?php echo $this->user_action; ?>
+            <br />
+            <br />
+            Please be advised that the system converts the date you will set to <b><?php echo $this->timezone;  ?></b> timezone.
+            <br>
+            <br>
+			<?php
+			if(isset($this->error)) :
+			?>
+			<div class="messages">
+			<ul id="flash-messages">
+			<li class="flash-error">The following errors occurred.<br>
+			<?php
+			if(isset($this->error['EMPTY'])){
+				echo "Empty textfields: " . implode(", ", $this->error['EMPTY']) . "<br>";
+			}
+			if(isset($this->error['INVALID'])){
+				foreach($this->error['INVALID'] as $invalid){
+					echo $invalid . "<br>";
+				}
+			}
+			?>
+			</li>
+			</ul></div>
+			<?php
+			endif;
+			?>
+            <form action="<?php echo $this->form->getAction(); ?>"
+                  method="<?php echo $this->form->getMethod(); ?>" 
+                  name="<?php echo $this->form->getName(); ?>"
+                  enctype="<?php echo $this->form->getEnctype(); ?>"
+                  >
+
+                <div class="bluebackground">
+                    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="5" id="couponTable">
+                        <tbody><tr>
+                                <td width="30%"><?php echo $code->getLabel(); ?></td>
+                                <td width="15%"><?php echo $type->getLabel(); ?></td>
+                                <td width="15%"><?php echo $discountVal->getLabel(); ?></td>
+                                <td width="15%"><?php echo $amountQualifier->getLabel(); ?></td>
+                                <td width="15%"><?php echo $ceilingAmount->getLabel(); ?></td>
+                                <td width="5%">&nbsp;</td>
+                                <td width="5%">&nbsp;</td>
+                            </tr>
+                            <tr id="couponRow">
+                                <td valign="top"><?php echo $code; ?>
+                                </td>
+                                <td valign="top"><?php echo $type; ?>
+                                </td>
+                                <td valign="top"><?php echo $discountVal; ?>
+                                </td>
+                                <td valign="top">$<?php echo $amountQualifier; ?>
+                                </td>
+                                <td valign="top">$<?php echo $ceilingAmount; ?>
+
+                                </td>
+                                <td valign="top" align="center">
+								<a href="javascript:void(0)" onClick="bc_SplitTableRow(this);"><img src="/assets/img/plus.gif" /></a>
+								<?php //echo $this->form->getElement('plus'); ?></td>
+                                <td valign="top" align="center">
+								<a href="javascript:void(0)" onClick="deleteRow(this.parentNode.parentNode.rowIndex);"><img src="/assets/img/minus.gif" /></a>
+								<?php //echo $this->form->getElement('minus'); ?></td>
+                                <?php
+                                $discountValuesLen = count($this->discountVal);
+                                for ($x = 1; $x < $discountValuesLen; $x++) :
+                                    ?>
+                                <tr id="couponRow">
+                                    <td valign="top">&nbsp;
+                                    </td>
+                                    <td valign="top">&nbsp;
+                                    </td>
+                                    <td valign="top"><?php $discountVal->setValue($this->discountVal[$x]); 
+									echo $discountVal; ?>
+                                    </td>
+                                    <td valign="top">$<?php $amountQualifier->setValue($this->amountQualifier[$x]);
+                                    echo $amountQualifier; ?>
+                                    </td>
+                                    <td valign="top">&nbsp;
+
+                                    </td>
+                                    <td valign="top" align="center">
+									<a href="javascript:void(0)" onClick="bc_SplitTableRow(this);"><img src="/assets/img/plus.gif" /></a>
+									<?php //echo $this->form->getElement('plus'); ?></td>
+									<td valign="top" align="center">
+									<a href="javascript:void(0)" onClick="deleteRow(this.parentNode.parentNode.rowIndex);"><img src="/assets/img/minus.gif" /></a>
+									<?php //echo $this->form->getElement('minus'); ?></td>
+                                </tr>
+                            <?php endfor; ?>
+                            </tr>
+                        </tbody></table>
+                    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="5">
+                        <tbody><tr>
+                                <td width="30%"><div class="error <?php echo $code->getId(); ?>"></div></td>
+                                <td width="15%"></td>
+                                <td width="15%"><div class="error <?php echo $discountVal->getId(); ?>"></div></td>
+                                <td width="15%"><div class="error <?php echo $amountQualifier->getId(); ?>"></div></td>
+                                <td width="15%"><div class="error <?php echo $ceilingAmount->getId(); ?>"></div></td>
+                                <td width="5%">&nbsp;</td>
+                                <td width="5%">&nbsp;</td>
+                            </tr>
+
+                        </tbody></table>
+                    <?php echo $hidden; ?>
+                </div>
+                <br />
+                <b> Apply Coupon to: </b>
+                <?php echo $this->form->getDisplayGroup('coupons2'); 
+				$sites = $this->form->getElement('site');
+				$owners = $this->form->getElement('owner');
+				?>
+				<td width="15%"><div class="error <?php echo $sites->getId(); ?>"></div></td>
+				<td width="15%"><div class="error <?php echo $owners->getId(); ?>"></div></td>
+                <?php echo $this->form->getDisplayGroup('coupons3'); ?>
+                <b> Expiration:</b>
+                <br>
+                <br>
+                <?php echo $this->form->getElement('expiration'); ?>
+
+
+                <!-- Recurring form -->
+                <div style="display: none;" id="expiration_recurring">
+                    <br><br>&nbsp;&nbsp;
+                    Every <?php echo $startday; ?>
+                    to <?php echo $endday; ?> of the month,
+
+                    <?php echo $this->form->getElement('recurring_period'); ?>
+                    starting 
+                    <?php echo $this->form->getElement('recurring_period_month'); ?>
+                    <?php echo $this->form->getElement('recurring_period_year'); ?>
+                    <div class="error <?php echo $startday->getId(); ?>"></div>
+                    <br>
+                    <div class="error <?php echo $endday->getId(); ?>"></div>
+                </div>
+
+
+                <!-- First X Users form -->
+                <div style="display: none;" id="expiration_firstxusers">
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td width="10%"><?php echo $from->getLabel() . " " . $from; ?> </td>
+                                <td width="10%"><?php echo $to->getLabel() . " " . $to; ?></td>
+                            </tr>
+                            <tr>
+                                <td><div class="error <?php echo $from->getId(); ?>"> </div></td>
+                                <td><div class="error <?php echo $to->getId(); ?>"></div></td>
+                            </tr>
+                            <tr id="expiring_times">
+                                <td width="10%"><?php echo $from_min->getLabel() . " " . $from_min; ?> </td>
+                                <td width="10%"><?php echo $to_min->getLabel() . " " . $to_min; ?></td>
+                            </tr>
+                            <tr>
+                                <td><div class="error <?php echo $from_min->getId(); ?>"> </div></td>
+                                <td><div class="error <?php echo $to_min->getId(); ?>"></div></td>
+                            </tr>
+
+                        </tbody></table>
+                    <br />
+                    <div id="validfirstxusers">Make coupons valid for the first: <?php echo $firstXUsers; ?> users 
+                        <br> <div class="error <?php echo $firstXUsers->getId(); ?>"> </div></div>
+                    <!--<div id="freeshipping"><?php echo $free_shipping->getLabel() . " " . $free_shipping; ?></div>-->
+                </div>
+
+                <!-- End Expiration  -->
+
+                <br>
+                <br>
+                <br>
+
+                <div id="include-exclude">
+                    <div style="clear: both;"></div>
+                    <ul class="tab">
+                        <li>
+                            <a>
+                                <b>Restrictions</b>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="lists">
+                        <div id="tab1" class="tab_content" style="float: left; display: block; ">
+                            <div id="left-variable">
+                                <div style="width: 600px;"> 
+                                    <table cellpadding="0" cellspacing="10">
+                                        <tbody><tr>
+                                                <?php
+                                                $applyrestriction_checkbox = $this->form->getElement('applyrestriction_checkbox');
+                                                ?>
+                                                <td><?php echo $applyrestriction_checkbox->getLabel(); ?></td>
+                                                <td>
+                                                    <!--nayrb-->
+                                                    <?php
+                                                    echo $applyrestriction_checkbox;
+                                                    ?>
+                                            <!--<span id="viewtemplate_part"></span>
+                                            <span id="parts"></span>-->
+                                                </td>
+                                                <td>
+                                                    <?php 
+//                                                    $restriction = $this->form->getElement('restrictions');
+//                                                    echo $restriction; ?>
+                                                </td>
+                                                <td>
+<!--                                                    <div id="viewTemplate" style="<?php // echo ($applyrestriction_checkbox->getValue()) ? "display:block" : "display:none" ?>">
+                                                        <a style='cursor:pointer' href="/dcms/template/view/tid/" onclick='return viewTemplate(this, "viewTemplate", "<?php // echo $restriction->getId(); ?>");'><u>view</u></a>
+                                                    </div>    -->
+                                                </td>
+                                            </tr>
+                                        </tbody></table>
+                                    <?php echo $this->partial('template/selectbox.phtml', $this); ?>
+										<br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div id="calendar"></div>
+                    <div id="save-list">
+                    </div>
+                </div>
+                <br />
+                <div id="coupon" ><b><?php echo $publish->getLabel(); ?></b> <?php echo $publish; ?>
+                    <?php echo ($this->publish) ? "<br /><font color='red'>This coupon is currently active</font>" : "" ?>
+                </div>
+                <br />
+				<!--<input type="hidden" name="code_checker" value="<?php //echo $code->getValue(); ?>">-->
+				<?php 
+					$code_checker->setValue($code->getValue());
+					echo $code_checker;
+					echo $code_live;
+					
+				?>
+				<?php echo $this->form->getElement('save'); ?>
+
+            </form>
+        </div>
+    </div>
+</div>

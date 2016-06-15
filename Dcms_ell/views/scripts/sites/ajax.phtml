@@ -1,0 +1,39 @@
+<?php
+if($_GET['action']=='checksiteid'){
+    echo count($this->readsiteid);
+
+    return;
+}
+
+if($_GET['action']=='checkdomain'){
+    echo count($this->readdomain);
+
+    return;
+}
+
+if($_GET['action']=='checkchannelcode' || $_GET['action']=='checkchannelcodeUPDATE'){
+    if($this->readchannelcode!=""){
+        echo (int)$this->readchannelcode;
+    }else{
+        echo 0;
+    }
+
+    return;
+}
+
+if($_GET['action']=='checkservername' || $_GET['action']=='checkservernameUPDATE'){
+    if($this->readservername!=""){
+        echo $this->readservername;
+    }else{
+        echo 0;
+    }
+
+    return;
+}
+
+if($_GET['action']=='checkacronym'){
+    echo count($this->readacronym);
+
+    return;
+}
+?>

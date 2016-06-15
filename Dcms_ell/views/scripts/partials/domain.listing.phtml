@@ -1,0 +1,17 @@
+<?php
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+echo '<tr style="background-color:'.$__row_style.';">
+    <td style="text-align:center;"><div style="padding:5px;">'.$this->siteId.'</div></td>
+    <td><div style="padding:5px;"><a href="http://www.'.$this->name.'/" target="_blank">'.$this->name.'</a></div></td>
+    <td style="text-align:center;"><div style="padding:5px;">';
+
+    $t1 = count($this->channelCode);
+    for($i1=0;$i1<$t1;$i1++){
+        echo '<a href="/dcms/sites/updatesite/siteId/'.$this->siteId.'">'.$this->channelCode[$i1].'</a><br>';
+    }
+
+    echo '</div></td>
+    <td style="text-align:center;"><div style="padding:5px;">'.$this->acronym.'</div></td>
+    <td style="text-align:center;"><div style="padding:5px;"><a href="/dcms/sites/updatesite/siteId/'.$this->siteId.'">edit</a> | <a href="/dcms/sites/deletesite/siteId/'.$this->siteId.'"  onClick="return confirm(\'Are you sure you want to DELETE site ID '.$this->siteId.'?\')">delete</a></div></td>
+</tr>';
+?>

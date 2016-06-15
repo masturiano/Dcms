@@ -1,0 +1,231 @@
+<?php
+
+if(is_string($this->siteSkus)) :
+    echo $this->siteSkus;
+else :
+?>
+    <?php $isEqual = false; ?>
+    <script>
+        if(beforeSearch == searchKeyword) {
+            <?php $isEqual = true; ?>
+        }
+    </script>
+    <?php 
+
+    /**
+    * USAP SKU SELECT LIST
+    */
+
+    if((isset($this->element['usap'])) && ($this->element['usap'] == '#restriction_sku_sku_usap_list')) {
+        if((count($this->brandskuslist['records']['usap']) > 0) && (is_array($this->brandskuslist['records']['usap']))){
+            $recordCount = $this->brandskuslist['records']['usap']['record_count'];
+            unset($this->brandskuslist['records']['usap']['record_count']);
+            if($this->issearch) {
+                if($isEqual) {
+    ?>
+                    <script>
+                        //alert('equal search');
+                        <?php
+                            foreach($this->brandskuslist['records']['usap'] as $key => $skuUsap) :
+                                $data = '<option value="' . addslashes($skuUsap['sku']) . '">' . addslashes($skuUsap['sku']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element['usap']; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script>
+    <?php
+                } else {
+    ?>
+                    <script>
+                        <?php
+                            foreach($this->brandskuslist['records']['usap'] as $key => $skuUsap) :
+                                $data = '<option value="' . addslashes($skuUsap['sku']) . '">' . addslashes($skuUsap['sku']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element['usap']; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script> 
+    <?php
+                }
+    ?>
+                <script>
+                    if($("<?php echo $this->element['usap']; ?> option").size() + <?php echo (int) (count($this->siteSkus['usap']) > 0) ? count($this->siteSkus['usap']) : 0 ;?> < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element['usap']; ?>").append("<option value='append-search-sku-usap-list'>More...</option>");
+                    }
+                </script>
+    <?php                
+            } else {
+    ?>
+                <script>
+                    <?php
+                        foreach($this->brandskuslist['records']['usap'] as $key => $skuUsap) :
+                            $data = '<option value="' . addslashes($skuUsap['sku']) . '">' . addslashes($skuUsap['sku']) . '</option>';
+                    ?>
+                            $("<?php echo $this->element['usap']; ?>").append('<?php echo $data; ?>');
+                    <?php
+                        endforeach;
+                    ?>
+                    if($("<?php echo $this->element['usap']; ?> option").size() + <?php echo (int) (count($this->siteSkus['usap']) > 0) ? count($this->siteSkus['usap']) : 0 ;?> < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element['usap']; ?>").append("<option value='append'>More...</option>");
+                    }
+                </script>                                
+    <?php                
+            }
+        } else {
+    ?>
+            <script>
+                $("<?php echo $this->element['usap']; ?>").append("<option value='zero-result'>No Results Found</option>");
+            </script>
+    <?php            
+        }
+    }
+
+    /**
+    * JCW SKU SELECT LIST
+    */
+
+    if((isset($this->element['jcw'])) && ($this->element['jcw'] == '#restriction_sku_sku_jcw_list')) {
+        if((count($this->brandskuslist['records']['jcw']) > 0) && (is_array($this->brandskuslist['records']['jcw']))){
+            $recordCount = $this->brandskuslist['records']['jcw']['record_count'];
+            unset($this->brandskuslist['records']['jcw']['record_count']);
+            if($this->issearch) {
+                if($isEqual) {
+    ?>
+                    <script>
+                        <?php
+                            foreach($this->brandskuslist['records']['jcw'] as $key => $skuJcw) :
+                                $data = '<option value="' . addslashes($skuJcw['sku']) . '">' . addslashes($skuJcw['sku']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element['jcw']; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script>
+    <?php
+                } else {
+    ?>
+                    <script>
+                        <?php
+                            foreach($this->brandskuslist['records']['jcw'] as $key => $skuJcw) :
+                                $data = '<option value="' . addslashes($skuJcw['sku']) . '">' . addslashes($skuJcw['sku']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element['jcw']; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script> 
+    <?php
+                }
+    ?>
+                <script>
+                    if($("<?php echo $this->element['jcw']; ?> option").size() + <?php echo (int) (count($this->siteSkus['jcw']) > 0) ? count($this->siteSkus['jcw']) : 0 ;?> < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element['jcw']; ?>").append("<option value='append-search-sku-jcw-list'>More...</option>");
+                    }
+                </script>
+    <?php                
+            } else {
+    ?>
+                <script>
+                    <?php
+                        foreach($this->brandskuslist['records']['jcw'] as $key => $skuJcw) :
+                            $data = '<option value="' . addslashes($skuJcw['sku']) . '">' . addslashes($skuJcw['sku']) . '</option>';
+                    ?>
+                            $("<?php echo $this->element['jcw']; ?>").append('<?php echo $data; ?>');
+                    <?php
+                        endforeach;
+                    ?>
+                    if($("<?php echo $this->element['jcw']; ?> option").size() + <?php echo (int) (count($this->siteSkus['jcw']) > 0) ? count($this->siteSkus['jcw']) : 0 ;?> < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element['jcw']; ?>").append("<option value='append'>More...</option>");
+                    }
+                </script>                                
+    <?php                
+            }
+        } else {
+    ?>
+            <script>
+                $("<?php echo $this->element['jcw']; ?>").append("<option value='zero-result'>No Results Found</option>");
+            </script>
+    <?php            
+        }
+    }
+
+    /**
+    * END OF JCW SKU SELECT LIST
+    */
+
+    /**
+    * STT SKU SELECT LIST
+    */
+
+    if((isset($this->element['stt'])) && ($this->element['stt'] == '#restriction_sku_sku_stt_list')) {
+        if((count($this->brandskuslist['records']['stt']) > 0) && (is_array($this->brandskuslist['records']['stt']))){
+            $recordCount = $this->brandskuslist['records']['stt']['record_count'];
+            unset($this->brandskuslist['records']['stt']['record_count']);
+            if($this->issearch) {
+                if($isEqual) {
+    ?>
+                    <script>
+                        <?php
+                            foreach($this->brandskuslist['records']['stt'] as $key => $skuStt) :
+                                $data = '<option value="' . addslashes($skuStt['sku']) . '">' . addslashes($skuStt['sku']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element['stt']; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script>
+    <?php
+                } else {
+    ?>
+                    <script>
+                        <?php
+                            foreach($this->brandskuslist['records']['stt'] as $key => $skuStt) :
+                                $data = '<option value="' . addslashes($skuStt['sku']) . '">' . addslashes($skuStt['sku']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element['stt']; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script> 
+    <?php
+                }
+    ?>
+                <script>
+                    if($("<?php echo $this->element['stt']; ?> option").size() + <?php echo (int) (count($this->siteSkus['sty']) > 0) ? count($this->siteSkus['sty']) : 0 ;?> < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element['stt']; ?>").append("<option value='append-search-sku-stt-list'>More...</option>");
+                    }
+                </script>
+    <?php                
+            } else {
+    ?>
+                <script>
+                    <?php
+                        foreach($this->brandskuslist['records']['stt'] as $key => $skuStt) :
+                            $data = '<option value="' . addslashes($skuStt['sku']) . '">' . addslashes($skuStt['sku']) . '</option>';
+                    ?>
+                            $("<?php echo $this->element['stt']; ?>").append('<?php echo $data; ?>');
+                    <?php
+                        endforeach;
+                    ?>
+                    if($("<?php echo $this->element['stt']; ?> option").size() + <?php echo (int) (count($this->siteSkus['sty']) > 0) ? count($this->siteSkus['sty']) : 0 ;?> < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element['stt']; ?>").append("<option value='append'>More...</option>");
+                    }
+                </script>                                
+    <?php                
+            }
+        } else {
+    ?>
+            <script>
+                $("<?php echo $this->element['stt']; ?>").append("<option value='zero-result'>No Results Found</option>");
+            </script>
+    <?php            
+        }
+    }
+
+    /**
+    * END OF STT SKU SELECT LIST
+    */
+endif;
+?>

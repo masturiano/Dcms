@@ -1,0 +1,14 @@
+<?php $view = Zend_Registry::get('view');?>
+<?php $__row_style = (($this->partialCounter % 2 )? "dark" : "light"); ?>
+<tr class="<?php echo $__row_style;?>">
+                <td rowspan=2 style="text-align: center;"><h1><?php echo $this->generated . "/" . $this->simularity; ?></h1></td>
+                <td colspan=3><a href="/spinner/spin/index/id/<?php echo $this->id;?>"><?php echo $this->key;?></a></td>
+                <td colspan=2><?php echo $this->site;?></td>
+ </tr>
+<tr class="<?php echo $__row_style;?>">
+      <td><?php echo $this->partname;?></td>
+      <td><?php echo $this->brand;?></td>
+      <td><?php echo $this->make;?></td>
+      <td><?php echo $this->model;?></td>
+      <td><?php echo $this->year;?></td>
+ </tr>

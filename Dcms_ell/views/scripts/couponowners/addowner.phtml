@@ -1,0 +1,186 @@
+<style>
+.bg_btn{
+    background-color: #F6F6F6;
+    border-bottom: 5px solid #555555;
+    border-top: 5px solid #555555;
+    margin-top: 20px;
+    padding: 8px 10px;
+    text-align: right;
+}
+</style>
+<?php
+echo $this->headLink()->prependStylesheet('/assets/css/coupon.css');
+
+$owner     = $this->owneraddform->getElement('owner');
+$cancel    = $this->owneraddform->getElement('cancel');
+$owner_add = $this->owneraddform->getElement('owner_add');
+?>
+<script type="text/javascript">
+if(typeof String.prototype.trim !== 'function') {   String.prototype.trim = function() {     return this.replace(/^\s+|\s+$/g, '');    } }
+var owner = {};
+owner.id = "<?php echo $owner->getId(); ?>";
+owner.label = "<?php echo $owner->getLabel(); ?>";
+
+var errorHandler = {};
+    errorHandler.NOT_EMPTY = "should not be empty";
+    errorHandler.OWNER_EXISTS = "Owner with this name already exists";
+    errorHandler.HAS_NON_ALPHANUMERIC = "Not valid. Please input letters/numbers value only";
+    errorHandler.API_ERROR = "An error occured while requesting on API.";
+    
+var alphaNumericRegex = /^[A-Za-z0-9 ]{3,20}$/;    
+
+function letternumber(e, checkType)
+{
+    var key;
+    var keychar;
+
+    if (window.event)
+        key = window.event.keyCode;
+    else if (e)
+        key = e.which;
+    else
+        return true;
+    keychar = String.fromCharCode(key);
+    keychar = keychar.toLowerCase();
+
+    // control keys
+    if ((key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27) || (key==32) ) {
+        return true;
+    }
+
+    if(checkType == 'number') {
+        if(key >= 48 && key <= 57){
+            return true;
+        }else{
+            return false;
+        }
+    } else if(checkType == 'letter') {
+        if ((key >= 65 && key <= 90) || (key >=97 && key <= 122)) {
+            return true;
+        }else {
+            return false;
+        }
+    } else {
+        if ((key >= 65 && key <= 90) || (key >=97 && key <= 122) || (key >= 48 && key <= 57)) {
+            return true;
+        }else {
+            return false;
+        }
+    }        
+}
+
+function validateForm(){
+    var countError = 0;
+    
+    var ownerCounter = 0;
+    $('input[name^="'+owner.id+'"]').each(function(){
+        var inputValue = $.trim($(this).val());
+        if(inputValue == ""){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(owner.label + " " + errorHandler.NOT_EMPTY);
+            countError++;
+            ownerCounter++;
+        } else if(!alphaNumericRegex.test(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_NON_ALPHANUMERIC + ": " + inputValue);
+            countError++;
+            ownerCounter++;
+        } else{
+            if(ownerCounter==0){
+                ownerCounter = hasOwner(owner);
+                if(ownerCounter==0){
+                    $(this).removeClass('errorFocus');
+                    $('.'+this.id).html("");
+                }
+            }
+        }
+        countError += ownerCounter;
+    });
+
+    if(countError>0){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+function hasOwner(){
+    var inputData = $("#"+owner.id).val();
+    var errorCount = 0;
+    
+    jQuery.ajax({
+        url: "ajax/?action=checkowner",
+        type: "GET",
+        data: jQuery("#addowner_id").serialize(),
+        async: false,
+
+        success: function(data){
+            
+            var dataDoc = $.trim(data.toString());
+            dataDoc = dataDoc.substring(0,15);
+            if(dataDoc == "<!DOCTYPE html>") {
+                //<!DOCTYPE html>
+                $('#'+owner.id).addClass('errorFocus');
+                $('.'+owner.id).html('An error occurred or your session might have expired already. <br /> Click here to <a href="">login</a>.');
+                errorCount++;
+            } else {
+                if(data>0){
+                    if(data == "error") {
+                        $('#'+owner.id).addClass('errorFocus');
+                        $('.'+owner.id).html(errorHandler.API_ERROR);
+                        errorCount++;
+                    } else {
+                        $('#'+owner.id).addClass('errorFocus');
+                        $('.'+owner.id).html(errorHandler.OWNER_EXISTS + ": " + inputData);
+                        errorCount++;
+                    }
+                }else{
+                    $('#'+owner.id).removeClass('errorFocus');
+                    $('.'+owner.id).html("");
+                }
+            }
+        }
+    });
+    
+    return errorCount;
+}
+
+function checkIfEmpty(input, append){
+    var append = (append == null) ? "" : append;
+    var inputValue = $(append+'#'+input.id).val();
+    if(inputValue == ""){
+        $(append+'#'+input.id).addClass('errorFocus');
+        $(append+'.'+input.id).html(input.label + " " + errorHandler.NOT_EMPTY);
+        return 1;
+    }else{
+        $(append+'#'+input.id).removeClass('errorFocus');
+        $(append+'.'+input.id).html("");
+        return 0;
+    }
+}
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="addowner_id" name="addowner" class="dataform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <table width="615" border="0" cellpadding="0" cellspacing="0" id="domainTable1">
+                <tbody>
+                    <tr>
+                        <td width="150"><b><?php echo $owner->getLabel(); ?></b></td>
+                        <td><b><?php echo $owner; ?></b></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td valign="top"><div class="error <?php echo $owner->getId(); ?>"></div></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="bg_btn"><?php echo $cancel.' '.$owner_add; ?></div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+<?php
+if ($this->pageCount):
+    $query = $this->request;
+
+    ?>
+    <!--<ul style="font-size: 9px;">-->
+    <ul>
+        <!-- first page link -->
+        <?php if ($this->current != 1): ?>
+            <li>
+                <div class="">
+                    <a href="<?php echo $this->url(array_merge(array('page' => $this->first)), 'default'); ?>" title="<r3:trans>First</r3:trans>">
+                        &lt;&lt;&nbsp;<r3:trans>First</r3:trans>
+                    </a>
+                </div>
+            </li>
+        <?php else: ?>
+            <li>
+                <div class="disabled"><a>&lt;&lt;&nbsp;<r3:trans>First</r3:trans></a></div>
+            </li>
+        <?php endif; ?>
+
+        <!-- Previous page link -->
+        <?php if (isset($this->previous)): ?>
+            <li>
+                <div class="">
+                    <a href="<?php echo $this->url(array_merge(array('page' => $this->previous)), 'default'); ?>" title="<r3:trans>Previous</r3:trans>">
+                        &lt;&nbsp;<r3:trans>Previous</r3:trans>
+                    </a>
+                </div>
+            </li>
+        <?php else: ?>
+            <li>
+                <div class="disabled"><a>&lt;&nbsp;<r3:trans>Previous</r3:trans></a></div>
+            </li>
+        <?php endif; ?>
+
+
+
+        <!-- Numbered page links -->
+        <?php
+        if ($this->current < 102):
+
+            foreach ($this->pagesInRange as $page):
+                ?>
+                <?php if ($page != $this->current): ?>
+                    <li>
+                        <div class="">
+                            <a href="<?php echo $this->url(array_merge(array('page' => $page)), 'default'); ?>" title="<r3:trans>Page</r3:trans> <?php echo $page; ?>">
+                                <?php echo $page; ?>
+                            </a>
+                        </div>
+                    </li>
+                <?php else: ?>
+                    <li>
+                        <div class="disabled"><a><?php echo $page; ?></a></div>
+                    </li>
+                <?php endif; ?>
+                <?php
+            endforeach;
+        else :
+            ?>
+            <li>
+                <select>
+                    <?php
+                    foreach ($this->pagesInRange as $page):
+                        ?>
+                        <option onclick="window.location='<?php echo $this->url(array_merge(array('page' => $page)), 'default'); ?>'" <?php echo ($page == $this->current) ? "selected" : ""; ?> ><?php echo $page; ?></option>
+                        <?php
+                    endforeach;
+                    ?>
+                </select>
+            </li>
+        <?php
+        endif;
+        ?>
+
+        <!-- Next page link -->
+        <?php if (isset($this->next)): ?>
+            <li>
+                <div class="">
+                    <a href="<?php echo $this->url(array_merge(array('page' => $this->next)), 'default'); ?>" title="<r3:trans>Next</r3:trans>">
+                        <r3:trans>Next</r3:trans>&nbsp;&gt;
+                    </a>
+                </div>
+            </li> 
+        <?php else: ?>
+            <li>
+                <div class="disabled"><a><r3:trans>Next</r3:trans>&nbsp;&gt;</a></div>
+            </li>
+        <?php endif; ?>
+        <!-- Next page link -->
+        <?php if (isset($this->last) && $this->last != $this->current): ?>
+            <li>
+                <div class="">
+                    <a href="<?php echo $this->url(array_merge(array('page' => $this->last)), 'default'); ?>" title="<r3:trans>Last</r3:trans>">
+                        <r3:trans>Last</r3:trans>&nbsp;&gt;&gt;
+                    </a>
+                </div>
+            </li>
+        <?php else: ?>
+            <li>
+                <div class="disabled"><a><r3:trans>Last</r3:trans>&nbsp;&gt;&gt;</a></div>
+            </li>
+        <?php endif; ?>
+
+
+    </ul>
+<?php endif; ?>

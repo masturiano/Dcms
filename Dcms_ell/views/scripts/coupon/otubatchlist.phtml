@@ -1,0 +1,117 @@
+<script>
+function filterRecords(){
+    var batchId = $("#batchId").val();
+    
+    location.href = '/dcms/coupon/otubatchlist/countperpage/<?php echo $this->request['countperpage']; ?>/page/<?php echo $this->request['page']; ?>/batch_id/'+batchId;
+}
+$(document).keypress(function(e){
+    if ( e.which == 13 ) // Enter key = keycode 13
+    {
+    return false;
+    }
+
+});
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="searchbatchs_id" name="searchbatchs" class="datasearchform" action="" method="post" enctype="application/x-www-form-urlencoded">
+		<div class="messages"> 
+            <?php echo $this->flashMessages(); ?> 
+        </div> 
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponSearchTable">
+                    <tr>
+                        <td valign="top">
+                            Batch Name: <input type="text" id="batchId" maxlength="16" name="batchId" value="<?php if(isset($this->request['batch_id'])){echo $this->request['batch_id'];} ?>" />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="button" id="search_btn" name="search_btn" value="Filter" class="uniform" onclick="filterRecords();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="apply-coupon">
+                <div>&nbsp;</div>
+                <div>
+                    Coupon per page: 
+                    <select name="countperpage" onchange="location.href='/dcms/coupon/otubatchlist/countperpage/'+this.value+'/page/<?php echo $this->request['page']; ?>/batch_id/<?php echo $this->request['batch_id']; ?>';">
+                        <?php
+                        $pagecount = 10;
+                        for ($counter = 1; $counter <= 10; $counter++, $pagecount += 10) {
+                            $optionpage = "<option value='{$pagecount}'";
+                            ($this->request['countperpage'] == $pagecount) ? $optionpage .= " selected='selected'" : "";
+                            $optionpage .= ">{$pagecount}</option>";
+                            echo $optionpage;
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div>&nbsp;</div>
+                <div>
+				<!--<input type="submit" id="delete_id" name="delete" value="Delete" class="uniform" onClick="return confirm('Are you sure you want to DELETE all checked records?');" />-->
+                </div>
+                </div>
+			
+        </div>
+				<?php $pagevars = $this->paginator->getPages(); ?>
+				<div class="pagination">
+					<div class="page-info">
+						<?php echo $pagevars->totalItemCount; ?>
+					</div>
+
+					<?php
+					echo $this->paginationControl($this->paginator, 'Sliding', '/partials/otubatchpaginationcontrols.phtml', array('request' => $this->request));
+					?>
+				</div>
+                <table  class="datatable" width="100%">
+                    <thead>
+          
+                        <tr style="text-align: left;">
+                            <!--<th width="2%" rowspan="2">
+								<input type="checkbox" id="checkAllAuto" name="checkAllAuto" />
+                            </th>-->
+                            <th width="15%" rowspan="2">Batch ID</th>
+                            <th  width="15%" rowspan="2">Batch Name</th>
+                            <th  width="10%" rowspan="2">Date Created</th>
+                            <th  width="30%" colspan="3">Number of Coupons</th>
+                            <th  width="20%" rowspan="2">Action</th>
+                        </tr>
+                        <tr style="text-align: left;">
+                            <th  width="5%">Original</th>
+                            <th  width="5%">Used</th>
+                            <th  width="5%">Unused</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($this->paginator) {
+                            echo $this->partialLoop('partials/otubatch.listing.phtml', $this->paginator);
+                        }
+
+
+                        ?>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+                <div class="pagination">
+						<div class="page-info">
+							<?php echo $pagevars->totalItemCount; ?>
+						</div>
+
+						<?php
+						echo $this->paginationControl($this->paginator, 'Sliding', '/partials/otubatchpaginationcontrols.phtml', array('request' => $this->request));
+						?>
+					</div>
+				
+            
+        </form>
+                 <div class="bg_btn" style="float: right;">
+                     <input type="button" value="Add New OTU Coupon" name="site_otucoupon" onclick="location.href='/dcms/coupon/addotucoupon';" class="uniform" />
+                 </div>
+        <div style="clear: both">
+        </div>
+
+    </div>
+</div>

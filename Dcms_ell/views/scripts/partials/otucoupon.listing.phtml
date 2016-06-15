@@ -1,0 +1,42 @@
+<?php
+$view = Zend_Registry::get('view');
+$coupon = $this->coupon;
+$expiration = $this->expiration;
+
+$dateTimeExpiration = "";
+if(!empty($expiration['startDate']['sec']) && !empty($expiration['endDate']['sec'])){
+    $dateTimeExpiration = date('m/d/y', $expiration['startDate']['sec'])."<br>to<br>".date('m/d/y', $expiration['endDate']['sec']);
+}
+
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+$owner = $view->baseService->getOwner($coupon['owner']);
+$html = '<tr style="background-color:'.$__row_style.';">
+    <td><div style="padding:5px;">
+        <!--<a href="/dcms/coupon/updateotucoupon/name/'.$coupon['name'].'">-->'.$coupon['code'].'<!--</a>--><br>
+		<b>Batch name:</b>
+		<br>
+		' . $coupon['name'] .'
+		<br>
+            <b>Discount:</b><br>';
+
+            $rec2 = $coupon['discountVal'];
+            $rec3 = $coupon['amountQualifier'];
+            $t2 = count($rec2);
+
+            for($i2=0; $i2<$t2; $i2++){
+                if($coupon['type']=='amount'){
+                    $html .= "$".$rec2[$i2]." off orders over $".$rec3[$i2]."<br>";
+                }else{
+                    $html .= $rec2[$i2]."% off orders over $".$rec3[$i2]."<br>";
+                }
+            }
+    $html .= '</div></td>
+    <td><div style="padding:5px; text-align:center;">'.date('d M Y,', $this->createdAt['sec']).'<br>'.date('h:i:s a', $this->createdAt['sec']).'</div></td>
+    <td><div style="padding:5px; text-align:center;"><a href="/dcms/template/view/tid/'.$this->templateId.'" target="_blank">'.$this->restrictions.'</a></div></td>
+    <td><div style="padding:5px; text-align:center;">'. $coupon['siteAcr'].'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$dateTimeExpiration.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$owner['owner'].'</div></td>
+</tr>';
+
+echo $html;
+?>

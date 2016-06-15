@@ -1,0 +1,37 @@
+<?php
+$coupon = $this->coupon;
+$expiration = $this->expiration;
+
+$dateTimeExpiration = "";
+if(!empty($expiration['startDate']['sec']) && !empty($expiration['endDate']['sec'])){
+    $dateTimeExpiration = date('m/d/y h:m a', $expiration['startDate']['sec'])."<br>to<br>".date('m/d/y h:m a', $expiration['endDate']['sec']);
+}
+
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+$html = '<tr style="background-color:'.$__row_style.';">
+    <td><div style="padding:5px;">
+        <a href="/dcms/coupon/viewotucoupon/name/'.$coupon['name'].'">'.$coupon['code'].'</a><br>
+            <b>Discount</b><br>';
+
+            $rec2 = $coupon['discountVal'];
+            $rec3 = $coupon['amountQualifier'];
+            $t2 = count($rec2);
+
+            for($i2=0; $i2<$t2; $i2++){
+                if($coupon['type']=='amount'){
+                    $html .= "$".$rec2[$i2]." off orders over $".$rec3[$i2]."<br>";
+                }else{
+                    $html .= $rec2[$i2]."% off orders over $".$rec3[$i2]."<br>";
+                }
+            }
+
+    $html .= '</div></td>
+    <td><div style="padding:5px; text-align:center;">'.date('d M Y,', $this->createdAt['sec']).'<br>'.date('h:i:s', $this->createdAt['sec']).'</div></td>
+    <td><div style="padding:5px; text-align:center;"><a href="/dcms/template/view/templateName/'.$this->restrictions.'" target="_blank">'.$this->restrictions.'</a></div></td>
+    <td><div style="padding:5px; text-align:center;">'.$coupon['siteAcr'].'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$dateTimeExpiration.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->creator.'</div></td>
+</tr>';
+
+echo $html;
+?>

@@ -1,0 +1,93 @@
+<?php
+$results = $this->brandpartslist;
+if(is_string($results)) :
+    echo $results;
+else :
+    if((count($results['records']) > 0)
+            && (is_array($results['records']))
+    ) :
+        $recordCount = $results['records']['record_count'];
+        unset($results['records']['record_count']);
+        $isEqual = false;
+    ?>
+        <script>
+            var elementSize = 0;
+
+            if(beforeSearch == searchKeyword) {
+                <?php
+                    $isEqual = true;
+                ?>
+            }
+        </script>
+        <?php
+            if($this->issearch) {
+                if($isEqual) {
+        ?>
+                    <script>
+                        <?php
+                            foreach($results['records'] as $key => $part) :
+                                $data = '<option value="' . addslashes($part['part_name']) . '">' . addslashes($part['part_name']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script>        
+        <?php
+                } else {
+        ?>
+                    <script>
+                        <?php
+                            foreach($results['records'] as $key => $part) :
+                                $data = '<option value="' . addslashes($part['part_name']) . '">' . addslashes($part['part_name']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script> 
+        <?php
+                }
+        ?>
+                <script>   
+                    if("<?php echo $this->element; ?>" == "#restriction_brand_part_part_list") {
+                        elementSize = $("<?php echo $this->element; ?> option").size() + $("#restriction_brand_part_selected option").size();
+                    } else {
+                        elementSize = $("<?php echo $this->element; ?> option").size();
+                    }                
+                    if(elementSize < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element; ?>").append("<option value='append-search-brandpart-list'>More...</option>");
+                    }
+                </script>
+        <?php        
+            } else {
+        ?>
+            <script>
+                <?php
+                    foreach($results['records'] as $key => $part) :
+                        $data = '<option value="' . addslashes($part['part_name']) . '">' . addslashes($part['part_name']) . '</option>';
+                ?>
+                        $("<?php echo $this->element; ?>").append('<?php echo $data; ?>');
+                <?php
+                    endforeach;
+                ?> 
+                if("<?php echo $this->element; ?>" == "#restriction_brand_part_part_list") {
+                    elementSize = $("<?php echo $this->element; ?> option").size() + $("#restriction_brand_part_selected option").size();
+                } else {
+                    elementSize = $("<?php echo $this->element; ?> option").size();
+                }
+                if(elementSize < <?php echo $recordCount; ?>) {
+                    $("<?php echo $this->element; ?>").append("<option value='append'>More...</option>");
+                }
+            </script>
+    <?php
+            }
+    else :
+    ?>
+        <script>
+            $("<?php echo $this->element; ?>").append("<option value='zero-result'>No Results Found</option>");
+        </script>
+<?php
+    endif;
+endif;
+?>

@@ -1,0 +1,11 @@
+<?php
+$used = abs($this->initial - $this->remaining);
+
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+echo '<tr style="background-color:'.$__row_style.';">
+    <td><div style="padding:5px;"><a href="/dcms/coupon/otucouponsecondary/batch_id/'.$this->batch_id.'">'.$this->batch_id.'</a></div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->initial.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$used.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->remaining.'</div></td>
+</tr>';
+?>

@@ -1,0 +1,104 @@
+<?php
+$results = $this->brandlist;
+if(is_string($results)) :
+    echo $results;
+else : 
+    if($this->element == '#restriction_brand_part_brand_list') {
+        $element = 'append-search-brand-brand-list';
+    } elseif($this->element == '#restriction_sku_brand_list') {
+        $element = 'append-search-sku-brand-list';
+    } else {
+        $element = 'append-search-brand-list';
+    }
+    if((count($results['records']) > 0)
+            && (is_array($results['records']))
+    ) :
+        $recordCount = $results['records']['record_count'];
+        unset($results['records']['record_count']);
+        $isEqual = false;
+    ?>
+        <script>
+            var elementSize = 0;
+
+            if(beforeSearch == searchKeyword) {
+                <?php
+                    $isEqual = true;
+                ?>
+            }
+        </script>
+        <?php
+            if($this->issearch) {
+                if($isEqual) {
+        ?>
+                    <script>
+                        <?php
+                            foreach($results['records'] as $key => $brand) :
+                                //$brandValue = ($this->element == "#restriction_brand_list") ? $brand['brand_name'] : $brand['brand_id'];
+                                $data = '<option value="' . addslashes($brand['brand_name'])/*$brandValue*/ . '">' . addslashes($brand['brand_name']) . '</option>';                            
+                        ?>
+                                $("<?php echo $this->element; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script>        
+        <?php
+                } else {
+        ?>
+                    <script>
+                        <?php
+                            foreach($results['records'] as $key => $brand) :
+                                //$brandValue = ($this->element == "#restriction_brand_list") ? $brand['brand_name'] : $brand['brand_id'];
+                                $data = '<option value="' . addslashes($brand['brand_name'])/*$brandValue*/ . '">' . addslashes($brand['brand_name']) . '</option>';
+                        ?>
+                                $("<?php echo $this->element; ?>").append('<?php echo $data; ?>');
+                        <?php
+                            endforeach;
+                        ?>
+                    </script> 
+        <?php
+                }
+        ?>
+                <script>
+                    if("<?php echo $this->element; ?>" == "#restriction_brand_list") {
+                        elementSize = $("<?php echo $this->element; ?> option").size() + $("#restriction_brand_selected option").size();
+                    } else {
+                        elementSize = $("<?php echo $this->element; ?> option").size();
+                    }                 
+                    if(elementSize < <?php echo $recordCount; ?>) {
+                        $("<?php echo $this->element; ?>").append("<option value='<?php echo $element; ?>'>More...</option>");
+                    }
+                </script>
+        <?php        
+            } else {
+        ?>
+            <script>
+                <?php
+                    unset($results['records']['record_count']);
+                    foreach($results['records'] as $key => $brand) :
+                        //$brandValue = ($this->element == "#restriction_brand_list") ? $brand['brand_name'] : $brand['brand_id'];
+                        $data = '<option value="' . addslashes($brand['brand_name'])/*$brandValue*/ . '">' . addslashes($brand['brand_name']) . '</option>';
+                ?>
+                        $("<?php echo $this->element; ?>").append('<?php echo $data; ?>');
+                <?php
+                    endforeach;
+                ?>
+                if("<?php echo $this->element; ?>" == "#restriction_brand_list") {
+                    elementSize = $("<?php echo $this->element; ?> option").size() + $("#restriction_brand_selected option").size();
+                } else {
+                    elementSize = $("<?php echo $this->element; ?> option").size();
+                }                 
+                if(elementSize < <?php echo $recordCount; ?>) {
+                    $("<?php echo $this->element; ?>").append("<option value='append'>More...</option>");
+                }
+            </script>
+    <?php
+            }
+    else :
+    ?>
+        <script>
+            $("<?php echo $this->element; ?>").append("<option value='zero-result'>No Results Found</option>");
+        </script>
+    <?php
+    endif;
+endif;
+?>

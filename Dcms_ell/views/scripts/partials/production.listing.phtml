@@ -1,0 +1,20 @@
+<script>
+/*$('#checkAllAuto').click(
+    function(){
+        $("INPUT[type='checkbox']").attr('checked', $('#checkAllAuto').is(':checked'));    
+    }
+)*/
+</script>
+<?php
+//<td><div style="padding:5px; text-align:center;"><input type="checkbox" id="code['.$this->code.']" name="code['.$this->code.']" value="'.$this->code.'" /></div></td>
+//<td><div style="padding:5px; text-align:center;"><a href="/dcms/coupon/updateotucoupon/name/'.$this->name.'">'.$this->code.'</a></div></td>
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+echo '<tr style="background-color:'.$__row_style.';">
+    <td><div style="padding:5px;">'.$this->code.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->user.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->type.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.date('d M Y H:i a', $this->date['sec']) . '</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->couponType.'</div></td>
+    <td><div style="padding:5px; text-align:center;">'.$this->status.'</div></td>
+</tr>';
+?>

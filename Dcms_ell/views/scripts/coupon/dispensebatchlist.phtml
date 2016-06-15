@@ -1,0 +1,183 @@
+<script>
+function filterRecords(){
+    var batchName = $("#batchName").val();
+    var dateCreated = $("#dateCreated").val();
+    var batchId = $("#batchId").val();
+    var sortBy = $("#sortBy").val();
+    var orderBy = $("input[name=orderBy]:checked").val();
+    
+    location.href = '/dcms/coupon/dispensebatchlist/countperpage/<?php echo $this->request['countperpage']; ?>/page/<?php echo $this->request['page']; ?>/batch_name/'+batchName+'/date_created/'+dateCreated+'/batch_id/'+batchId+'/sort_by/'+sortBy+'/order_by/'+orderBy+'/';
+}
+$(document).keypress(function(e){
+    if ( e.which == 13 ) // Enter key = keycode 13
+    {
+    return false;
+    }
+
+});
+
+$(document).ready(function() {
+    var dates = $( "#dateCreated" ).datepicker({
+            defaultDate: "today",
+            changeMonth: true,
+            numberOfMonths: 1,
+            dateFormat: 'M dd, yy', 
+            //minDate: new Date(), 
+            //            maxDate: new Date(2012,6, 27),
+            onSelect: function( selectedDate ) {
+                var option = this.id == "startDate" ? "minDate" : "maxDate",
+                instance = $( this ).data( "datepicker" ),
+                date = $.datepicker.parseDate(
+                instance.settings.dateFormat ||
+                    $.datepicker._defaults.dateFormat,
+                selectedDate, instance.settings );
+                dates.not( this ).datepicker( "option", option, date );
+            }
+        });
+});
+
+function clearDateCreated(str)
+{    
+   document.getElementById(str).value= "";
+}
+
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="searchbatchs_id" name="searchbatchs" class="datasearchform" action="" method="post" enctype="application/x-www-form-urlencoded">
+		<div class="messages"> 
+            <?php echo $this->flashMessages(); ?> 
+        </div> 
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponSearchTable">
+                    <tr>
+                        <td valign="top">Batch Name</td>
+                        <td valign="top">:</td>
+                        <td>
+                            <input type="text" id="batchName" maxlength="16" name="batchName" value="<?php if(isset($this->request['batch_name'])){echo $this->request['batch_name'];} ?>" />
+                        </td>
+                        <td>Date Created</td>
+                        <td>:</td>
+                        <td>
+                            <input type="text" id="dateCreated" maxlength="16" name="dateCreated" value="<?php if(isset($this->request['date_created'])){echo $this->request['date_created'];} ?>" onClick="clearDateCreated(this.id);" readonly="readonly"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Batch ID</td>
+                        <td>:</td>
+                        <td>
+                            <input type="text" id="batchId" maxlength="16" name="batchId" value="<?php if(isset($this->request['batch_id'])){echo $this->request['batch_id'];} ?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sort by</td>
+                        <td>:</td>
+                        <td>
+                            <select id="sortBy" name="sortBy" style="width:177px;background-color:white;">
+                                <option value="dateCreated">Date Created</option>
+                                <option value="batchId">Batch ID</option>
+                                <option value="coupon.name">Batch Name</option>
+                            </select>
+                        </td>
+                        <td>
+                            Asc
+                            <input type="radio" id="orderBy" name="orderBy" value="asc" checked/>
+                            Desc
+                            <input type="radio" id="orderBy" name="orderBy" value="desc" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <div align="right">
+                                <input type="button" id="search_btn" name="search_btn" value="Filter" class="uniform" style="float:right;" onclick="filterRecords();" />    
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="apply-coupon">
+                <div>&nbsp;</div>
+                <div>
+                    Coupon per page: 
+                    <select name="countperpage" onchange="location.href='/dcms/coupon/dispensebatchlist/countperpage/'+this.value+'/page/<?php echo $this->request['page']; ?>/batch_id/<?php echo $this->request['batch_id']; ?>';">
+                        <?php
+                        $pagecount = 10;
+                        for ($counter = 1; $counter <= 10; $counter++, $pagecount += 10) {
+                            $optionpage = "<option value='{$pagecount}'";
+                            ($this->request['countperpage'] == $pagecount) ? $optionpage .= " selected='selected'" : "";
+                            $optionpage .= ">{$pagecount}</option>";
+                            echo $optionpage;
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div>&nbsp;</div>
+                <div>
+				<!--<input type="submit" id="delete_id" name="delete" value="Delete" class="uniform" onClick="return confirm('Are you sure you want to DELETE all checked records?');" />-->
+                </div>
+                </div>
+			
+        </div>
+				<?php $pagevars = $this->paginator->getPages(); ?>
+				<div class="pagination">
+					<div class="page-info">
+						<?php echo $pagevars->totalItemCount; ?>
+					</div>
+
+					<?php
+					echo $this->paginationControl($this->paginator, 'Sliding', '/partials/otubatchpaginationcontrols.phtml', array('request' => $this->request));
+					?>
+				</div>
+                <table  class="datatable" width="100%">
+                    <thead>
+          
+                        <tr style="text-align: left;">
+                            <th width="2%" rowspan="2">
+								<!--<input type="checkbox" id="checkAllAuto" name="checkAllAuto" />-->
+                            </th>
+                            <th width="15%" rowspan="2">Batch ID</th>
+                            <th  width="15%" rowspan="2">Batch Name</th>
+                            <th  width="10%" rowspan="2">Date Created</th>
+                            <th  width="30%" colspan="3">Number of Coupons</th>
+                            <th  width="20%" rowspan="2">Action</th>
+                        </tr>
+                        <tr style="text-align: left;">
+                            <th  width="5%">Original</th>
+                            <th  width="5%">Used</th>
+                            <th  width="5%">Unused</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if ($this->paginator) {
+                            echo $this->partialLoop('partials/dispensebatch.listing.phtml', $this->paginator);
+                        }
+
+
+                        ?>
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+                <div class="pagination">
+						<div class="page-info">
+							<?php echo $pagevars->totalItemCount; ?>
+						</div>
+
+						<?php
+						echo $this->paginationControl($this->paginator, 'Sliding', '/partials/dispensebatchpaginationcontrols.phtml', array('request' => $this->request));
+						?>
+					</div>
+				
+            
+        </form>
+                 <div class="bg_btn" style="float: right;">
+                     <input type="button" value="Add New OTU Coupon" name="site_otucoupon" onclick="location.href='/dcms/coupon/addotucoupon';" class="uniform" />
+                 </div>
+        <div style="clear: both">
+        </div>
+
+    </div>
+</div>

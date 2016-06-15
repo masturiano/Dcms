@@ -1,0 +1,25 @@
+<?php
+$total = $this->count;
+$templates = $this->items;
+?>   
+<input type="hidden" id="templateCount" value="<?php echo $total; ?>">
+<input type="text" id="templateSearch" disabled=true style="width: 300px" /> <input disabled=true id="templateSearchBtn"  type="button" value="Search" onclick ="setClicked(true);loadResults(0);" />
+<br>
+<br>
+<select size = "<?php echo ($this->templateName != "" && !in_array($this->templateName, $templates)) ? 11 : 10; ?>" id="restrictions" name="restrictions" style="width: 350px" disabled=true>
+    <?php
+    if ($this->templateName != "" && $total != 0) {
+        echo "<option selected value='{$this->templateId}' ondblclick=\"openTemplate('/dcms/template/view/tid/{$this->templateId}', 'viewTemplate');\">{$this->templateName}</option>";
+    }
+    foreach ($templates as $key => $template) :
+        $templateId = $template['templateId'];
+        $templateName = $template['templateName'];
+        if ($this->templateName != "" && $this->templateName == $templateName) {
+            
+        } else {
+            echo "<option value='{$templateId}' ondblclick=\"openTemplate('/dcms/template/view/tid/{$templateId}', 'viewTemplate');\">{$templateName}</option>";
+        }
+
+    endforeach;
+    ?>
+</select>

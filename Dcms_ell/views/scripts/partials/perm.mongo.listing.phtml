@@ -1,0 +1,54 @@
+
+<?php $__row_style = (($this->partialCounter % 2 ) ? "dark" : "light"); ?>
+<tr class="<?php echo $__row_style; ?>">
+    <td><?php echo $this->name; ?></td>
+    <td><?php
+if (isset($this->permissions)) {
+    if (is_array($this->permissions)) {
+        $permissions = implode(', ', $this->permissions);
+        $pos = 60;
+        echo wordwrap($permissions, $pos, "<br />\n");
+    }
+}
+?></td>
+    <td><?php if (isset($this->isdefaultrole) && $this->isdefaultrole == 0) : ?>
+            <?php
+            $actions = array();
+            $actions['user.edit'] = <<<ACTION
+<a href="/user/admin/editrole/id/$this->id/page/$this->current" onclick="return confirm('Are you sure you want to edit this role');"><img border="0" src="/assets/img/edit.png" title="Edit this item"/></a>
+ACTION;
+            $actions['user.delete'] = <<<ACTION
+<a href="/user/admin/delrole/id/$this->id/page/$this->current" onclick="return confirm('Are you sure you want to delete this role');"><img border="0" src="/assets/img/delete.png" title="Delete this item"/></a>
+ACTION;
+            if (Zend_Registry::isRegistered('acl')) {
+                $acl = Zend_Registry::get('acl');
+                $thisuser = Zend_Registry::get('user');
+                $permissions = array_keys($actions);
+                foreach ($permissions as $permission) {
+                    $toolset = $thisuser->findToolsWithAdminRoles($thisuser->getRoles());
+                    if ($toolset && !in_array('user', $toolset)) {
+                        $toolmatch = implode('|', $toolset);
+                        preg_match_all('/(' . $toolmatch . ')\.(\w+)/', implode(' ', $this->permissions), $matchesarray);
+                        if (!empty($matchesarray[1])) {
+                            $common = array_unique($matchesarray[1]);
+                            foreach ($common as $context) {
+                                if (!$acl->isAllowed($thisuser . '', $context, $permission)) {
+                                    unset($actions[$permission]);
+                                }
+                            }
+                        } elseif (!$acl->isAllowed($thisuser . '', null, $permission)) {
+                            unset($actions[$permission]);
+                        }
+                    } elseif (!$acl->isAllowed($thisuser . '', null, $permission)) {
+                        unset($actions[$permission]);
+                    }
+                }
+            }
+            if (!empty($actions)) {
+                echo implode('&nbsp;&nbsp;', $actions);
+            }
+            ?>
+        <?php else: ?>
+            &nbsp;
+        <?php endif; ?>
+    </td>

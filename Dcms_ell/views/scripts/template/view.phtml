@@ -1,0 +1,302 @@
+<style>
+    #main li {
+        display:block;
+        list-style: none outside none;
+    }
+    .flash-info {
+        background-color: #BDE5F8;
+        background-image: url("/assets/img/info.png");
+        background-position: 10px center;
+        background-repeat: no-repeat;
+        border: 1px solid;
+        margin: 0;
+        padding: 15px 10px 15px 50px;
+        color: #00529B;
+    }
+    ul, ol {
+        
+    }
+    p, ul, ol {
+        line-height: 160%;
+        margin-bottom: 1.8em;
+    }
+    * {
+        padding: 0;
+    }
+</style>
+
+<div class="container">
+    <div id="main" style="border: 1px solid #D5D5D5; margin: 0; padding: 10px; position: relative; font-family: arial;">
+        <div class="messages">
+            <?php echo $this->flashMessages(); ?>
+        </div>
+        <div style="background: none repeat scroll 0 0 #F5F8FC; border: 1px solid #B2B7D5; margin: 10px 0; overflow: hidden; padding: 10px;">
+            <div style="font-weight: bold; font-size: 14px; text-align: center;"><?php echo $this->data['templateName']; ?></div>
+            <br />
+            <div style="font-size: 12px;">
+                <div style="float: left; width: 49%;"><b>Created by:</b> <?php echo $this->data['creator']; ?></div>
+                <div style="font-size: 12px;"><b>Type:</b> <?php echo ucfirst($this->data['type']); ?></div>
+            </div>
+            <!-- you can add another div here -->
+            <br />
+            <table cellpadding="5px" width="100%">
+                <tr>
+                    <td align="center" colspan="5" style="background: #DED9DA;">
+                        <span style="font-size: 14px; font-weight: bold;">Brands</span>
+                    </td>
+                </tr>
+                <?php
+                if (count($this->data['brands']) > 0) :
+                    echo buildTableData($this->data['brands']);
+                else:
+                    ?>
+                    <tr>
+                        <td align="center" colspan="5">
+                            <span style="font-size: 12px; font-weight: bold;">No brands found.</span>
+                        </td>
+                    </tr>
+                <?php
+                endif;
+                ?>
+                <tr>
+                    <td align="center" colspan="5">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="5" style="background: #DED9DA;">
+                        <span style="font-size: 14px; font-weight: bold;">Parts</span>
+                    </td>
+                </tr>
+                <?php
+                if (count($this->data['parts']) > 0) :
+                    echo buildTableData($this->data['parts']);
+                    ?>
+                    <?php
+                else:
+                    ?>
+                    <tr>
+                        <td align="center" colspan="5">
+                            <span style="font-size: 12px; font-weight: bold;">No parts found.</span>
+                        </td>
+                    </tr>
+                <?php
+                endif;
+                ?>
+                <tr>
+                    <td align="center" colspan="5">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="5" style="background: #DED9DA;">
+                        <span style="font-size: 14px; font-weight: bold;">Brand-Part</span>
+                    </td>
+                </tr>
+                <?php
+                if (count($this->data['brandPart']) > 0) :
+                    ?>
+                    <?php
+                    foreach ($this->data['brandPart'] as $brand => $parts) :
+                    ?>
+                        <tr>
+                            <td align="left" colspan="5" style="font-size: 12px; font-weight: bold;"><?php echo $brand; ?></td>
+                            <td><?php echo buildTableData($parts); ?></td>
+                        </tr>
+                        <tr>
+                            <td align="center" colspan="5">&nbsp;</td>
+                        </tr>
+                    <?php
+
+                    endforeach;
+                    ?>
+
+                    <?php
+                else:
+                    ?>
+                    <tr>
+                        <td align="center" colspan="5">
+                            <span style="font-size: 12px; font-weight: bold;">No brand-part found.</span>
+                        </td>
+                    </tr>                        
+                <?php
+                endif;
+                ?>                
+                <tr>
+                    <td align="center" colspan="5">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="5" style="background: #DED9DA;">
+                        <span style="font-size: 14px; font-weight: bold;">Part-Brand</span>
+                    </td>
+                </tr>
+                <?php
+                if (count($this->data['partBrand']) > 0) :
+                    ?>
+                    <?php
+                    foreach ($this->data['partBrand'] as $part => $brands) :
+                    ?>
+                        <tr>
+                            <td align="left" colspan="5" style="font-size: 12px; font-weight: bold;"><?php echo $part; ?></td>
+                            <td><?php echo buildTableData($brands); ?></td>
+                        </tr>
+                        <tr>
+                            <td align="center" colspan="5">&nbsp;</td>
+                        </tr>
+                    <?php
+
+                    endforeach;
+                    ?>
+
+                    <?php
+                else:
+                    ?>
+                    <tr>
+                        <td align="center" colspan="5">
+                            <span style="font-size: 12px; font-weight: bold;">No part-brand found.</span>
+                        </td>
+                    </tr>                        
+                <?php
+                endif;
+                ?>                
+                <tr>
+                    <td align="center" colspan="5">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="5" style="background: #DED9DA;">
+                        <span style="font-size: 14px; font-weight: bold;">Brand-Skus</span>
+                    </td>
+                </tr>
+                <?php
+                if (count($this->data['brandSku']) > 0) :
+                    ?>
+                    <!-- USAP -->
+                    <tr>
+                        <td align="center" colspan="5" style="font-size: 13px; font-weight: bold;">USAP <hr width="50%" /></td>
+                    </tr>                                
+
+                    <?php
+                    if (count($this->data['brandSku']['usap']) > 0) :
+                        ?>
+                        <?php
+                        foreach ($this->data['brandSku']['usap'] as $brand => $skus) :
+                            ?>
+                            <tr>
+                                <td align="left" colspan="5" style="font-size: 12px; font-weight: bold;"><?php echo $brand; ?></td>
+                                <td><?php echo buildTableData($skus); ?></td>
+                            </tr>
+
+                            <tr>
+                                <td align="center" colspan="5">&nbsp;</td>
+                            </tr>
+                            <?php
+                        endforeach;
+                        ?>
+                        <?php
+                    else:
+                        ?>
+                        <tr>
+                            <td align="center" colspan="5">
+                                <span style="font-size: 12px; font-weight: bold;">No USAP brand-skus found.</span>
+                            </td>
+                        </tr> 
+                    <?php
+                    endif;
+                    ?>
+
+                    <!-- JCW -->
+                    <tr>
+                        <td align="center" colspan="5" style="font-size: 13px; font-weight: bold;">JCW <hr width="50%" /></td>
+                    </tr>                                
+
+                    <?php
+                    if (count($this->data['brandSku']['jcw']) > 0) :
+                        ?>
+                        <?php
+                        foreach ($this->data['brandSku']['jcw'] as $brand => $skus) :
+                            ?>
+                            <tr>
+                                <td align="left" colspan="5" style="font-size: 12px; font-weight: bold;"><?php echo $brand; ?></td>
+                                <td><?php echo buildTableData($skus); ?></td>
+                            </tr>
+
+                            <tr>
+                                <td align="center" colspan="5">&nbsp;</td>
+                            </tr>
+                            <?php
+                        endforeach;
+                        ?>
+                        <?php
+                    else:
+                        ?>
+                        <tr>
+                            <td align="center" colspan="5">
+                                <span style="font-size: 12px; font-weight: bold;">No JCW brand-skus found.</span>
+                            </td>
+                        </tr> 
+                    <?php
+                    endif;
+                    ?>
+
+                    <!-- STT -->
+                    <tr>
+                        <td align="center" colspan="5" style="font-size: 13px; font-weight: bold;">STT <hr width="50%" /></td>
+                    </tr>                                
+
+                    <?php
+                    if (count($this->data['brandSku']['stt']) > 0) :
+                        ?>
+                        <?php
+                        foreach ($this->data['brandSku']['stt'] as $brand => $skus) :
+                            ?>
+                            <tr>
+                                <td align="left" colspan="5" style="font-size: 12px; font-weight: bold;"><?php echo $brand; ?></td>
+                                <td><?php echo buildTableData($skus); ?></td>
+                            </tr>
+
+                            <tr>
+                                <td align="center" colspan="5">&nbsp;</td>
+                            </tr>
+                            <?php
+                        endforeach;
+                        ?>
+                        <?php
+                    else:
+                        ?>
+                        <tr>
+                            <td align="center" colspan="5">
+                                <span style="font-size: 12px; font-weight: bold;">No STT brand-skus found.</span>
+                            </td>
+                        </tr> 
+                    <?php
+                    endif;
+                    ?>                                
+
+                    <?php
+                else:
+                    ?>
+                    <tr>
+                        <td align="center" colspan="5">
+                            <span style="font-size: 12px; font-weight: bold;">No brand-skus found.</span>
+                        </td>
+                    </tr>                        
+                <?php
+                endif;
+                ?>
+            </table>
+        </div>
+    </div>
+</div>
+
+<?php
+
+function buildTableData($column) {
+    $tableElements = "";
+    foreach ($column as $key => $data) :
+        if ($ctr % 5 == 0) {
+            $tableElements .= "<tr>";
+            $tableElements .= "<td>" . $data . "</td> ";
+        } else {
+            $tableElements .= "<td>" . $data . "</td> ";
+        }
+        $ctr++;
+    endforeach;
+    return $tableElements;
+}
+?>

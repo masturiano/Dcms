@@ -1,0 +1,13 @@
+<?php
+$total = $this->count;
+$limit = $this->limit;
+$curSkip = $this->skip;
+$skip = 0;
+$countPerPage = ceil($total / $limit);
+echo "<ul id='mycarousel' class='jcarousel-skin-tango' >";
+for ($i = 1; $i <= $countPerPage; $i++) {
+    echo "<li id='page{$skip}'><a onclick=\"loadResults({$skip})\" style='cursor:pointer'>{$i}</a></li>";
+    $skip += $limit;
+}
+echo "</ul>";
+?>

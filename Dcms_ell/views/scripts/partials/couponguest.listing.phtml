@@ -1,0 +1,79 @@
+<?php
+$view = Zend_Registry::get('view');
+$coupon = $this->coupon;
+$expiration = $this->expiration;
+?>
+<?php $__row_style = (($this->partialCounter % 2 ) ? "dark" : "light"); ?>
+
+<tr class="<?php echo $__row_style; ?>">
+
+    <td></td>
+    <td><span style="font-size: 14px;"><b><a href="/dcms/coupon/view/id/<?php echo $this->id; ?>"><?php echo $coupon['name']; ?></a></b></span>
+        <?php
+        if (isset($coupon['discountVal']) && isset($coupon['amountQualifier']) 
+			&& count($coupon['discountVal']) > 0 && count($coupon['amountQualifier']) > 0
+		) :
+            $discountVal = $coupon['discountVal'];
+            $amountQualifier = $coupon['amountQualifier'];
+            ?>
+            <br>
+            <span style="font-size: 12px;">
+                <b>Discount<?php echo (count($discountVal) > 1) ? "s" : ""; ?>:</b>
+                <br>
+                <?php
+                foreach ($discountVal as $key => $value) {
+                    $dValue = "";
+                    if ($coupon['type'] == "percent") {
+                        $dValue = $value . "%";
+                    } else {
+                        $dValue = "$" . $value;
+                    }
+                    echo "<b>$dValue</b> off orders over <b>$ " . $amountQualifier[$key]  . "</b>";
+                    echo "<br>";
+                }
+                ?>
+            </span>
+        <?php endif; ?>
+    </td>
+    <td><span style="font-size: 12px"><?php
+			if(isset($this->createdAt)){
+				$date =  $this->createdAt;
+				if(isset($date['sec']) && is_int($date['sec'])){
+					echo date('m/d/Y, h:i a', $date['sec']);
+				}else{
+					echo date('m/d/Y, h:i a', strtotime($date));
+				}
+			}
+        ?></span></td>
+    <td><?php
+            if (!empty($this->templateId)) :
+            ?>
+            <a style='cursor:pointer' href="/dcms/template/view/tid/<?php echo $this->templateId ?>" onclick='return popView(this, "viewTemplate");'><u><?php echo $this->restrictions ?></u></a>
+        <?php endif ?>
+    </td>
+    <td><?php
+		 if(isset($coupon['domains'][0])){
+            $acronym = $view->couponService->searchLive(array('name' => $coupon['domains'][0]), "domains");
+            if(count($acronym) && isset($acronym[0]['acronym'])){
+             echo $acronym[0]['acronym'];
+            }
+            $coupon['domains'][0];
+        }
+        ?></td>
+    <td><?php
+       echo $view->base->setTimeframeMessage($expiration);
+        ?></td>
+    <td>
+        <?php
+		if(isset($coupon['owner'])){
+			$getOwner = $view->base->getOwner();
+			$owner = isset($getOwner[$coupon['owner']]) ? $getOwner[$coupon['owner']] : "";
+			echo $owner;
+		}
+        
+        ?>
+    </td>
+</tr>
+
+
+

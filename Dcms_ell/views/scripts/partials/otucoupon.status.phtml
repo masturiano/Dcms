@@ -1,0 +1,96 @@
+<script>
+    
+    function retryJob(params){
+//    function retryJob(jobid, seed, quantity, batch_id, action){
+
+
+        //        $.get( "http://mardiente.usaptool.dev.usautoparts.com/manageotu/", { jobid: jobid, seed: seed, quantity: quantity, batch_id: batch_id, action: action, env: "<?php echo $this->env ?>" } );
+
+        $.ajax({
+            url: "/dcms/otucoupon/retryworker/format/json/",
+//            data: { jobid: jobid, seed: seed, quantity: quantity, batch_id: batch_id, action: action, env: "<?php echo $this->env ?>", format:"json" },
+            data: { args: params},
+            success: (function(){
+                
+            })
+        });
+        
+        return false;
+    }
+    
+</script>
+<table  class="datatable" width="100%">
+    <thead>
+
+        <tr style="text-align: left;">
+
+            <th width="20%">
+                Batch Name
+            </th>
+            <th  width="10%">
+                Date Created
+            </th>
+            <th  width="10%">
+                Created by
+            </th>
+
+            <th  width="20%">
+                Duration
+
+            </th>
+            <th  width="5%">
+                Status 
+            </th>
+            <?php if ($this->hasControl) { ?>
+                <th  width="5%">
+                    Action 
+                </th>
+            <?php } ?>
+
+        </tr>
+
+
+    </thead>
+    <tbody>
+        <?php
+        $jobs = $this->jobs;
+
+        foreach ($jobs as $jobid => $data) {
+            $jobPayLoad = unserialize($data['jobPayload']);
+            $dateCreated = date("M-d-Y h:i:s", $data['dateCreated']['sec']);
+            $d1 = new DateTime($dateCreated);
+            $d2 = new DateTime(date("M-d-Y h:i:s"));
+            $interval = $d2->diff($d1);
+
+            $duration = $interval->format('%d days, %H hours, %I minutes, %S seconds');
+            echo "
+    <tr>
+    <td>{$jobPayLoad['data']['batch_name']}</td>
+    <td>{$dateCreated}</td>
+    <td>{$jobPayLoad['data']['creator']}</td>
+    <td>{$duration}</td>
+    
+    <td>{$data['status']}</td>
+     
+    
+";
+    
+//       if($this->hasControl){
+//           echo "<!--<td><a href='http://mardiente.usaptool.dev.usautoparts.com/manageotu/?jobid={$jobid}&seed={$jobPayLoad['data']['seed']}&quantity={$jobPayLoad['data']['quantity']}&batch_id={$jobPayLoad['data']['batch_id']}&action={$jobPayLoad['data']['action']}&env={$this->env}&format=printr'>retry</a></td>-->
+//           <td><a style='cursor:pointer' onclick='retryJob(\"{$jobid}\", \"{$jobPayLoad['data']['seed']}\", \"{$jobPayLoad['data']['quantity']}\", \"{$jobPayLoad['data']['batch_id']}\", \"{$jobPayLoad['data']['action']}\")'>retry</a></td>";
+//       }
+       if($this->hasControl){
+           echo "<td><a  href='/dcms/otucoupon/retryworker/format/json/args/?jobid={$jobid}&seed={$jobPayLoad['data']['seed']}&quantity={$jobPayLoad['data']['quantity']}&batch_id={$jobPayLoad['data']['batch_id']}&jobaction={$jobPayLoad['data']['action']}}&format=json'>retry</a></td>";
+       }
+       echo "</tr>";
+
+//    echo "<br><br>http://mardiente.usaptool.dev.usautoparts.com/manageotu/args/?jobid={$jobid}&seed={$jobPayLoad['data']['seed']}&quantity={$jobPayLoad['data']['quantity']}&batch_id={$jobPayLoad['data']['batch_id']}&action={$jobPayLoad['data']['action']}&env={$this->env}&format=printr";
+            ?>
+            <?php
+        }
+        ?>
+
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>

@@ -1,0 +1,30 @@
+<?php
+$total = $this->count;
+$coupons = $this->items;
+?>   
+Live Coupons/Batches that uses this template. <br><br>
+<input type="hidden" id="couponCount" value="<?php echo $total; ?>">
+<input type="text" id="couponSearch" style="width: 300px" /> <input id="couponSearchBtn"  type="button" value="Search" onclick ="setClicked(true);loadResults(0);" />
+<div class="error couponSearch"> </div>
+<br>
+<br>
+<div id="couponDetails" name="couponDetails"  disabled=true> 
+    
+    <table id ="couponsperpage" style="width: 350px; border: 1px solid #999;" cellspacing = "4">
+        <tr>
+            <td style="border-bottom: 1px solid #999;"><b>Coupon Code/Batch Name</b></td>
+            <td style="border-bottom: 1px solid #999;"><b>Expiration Type</b></td>
+        </tr>
+        <?php
+        foreach ($coupons as $coupon) :
+            echo "<tr>";
+                $expirationType = $coupon['expiration']['type'];
+                $couponName = ($expirationType == "onetimeuse") ? $coupon['coupon']['name'] : $coupon['coupon']['code'];
+                echo "<td>{$couponName}</td>";
+                echo "<td>{$expirationType}</td>";
+
+            echo "</tr>";
+        endforeach;
+        ?>
+    </table>
+</div>

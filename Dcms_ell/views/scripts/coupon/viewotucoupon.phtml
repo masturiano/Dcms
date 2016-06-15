@@ -1,0 +1,130 @@
+<?php
+$coupon = $this->readotucoupon[0]['coupon'];
+$expiration = $this->readotucoupon[0]['expiration'];
+?>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.guest.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="addcoupon_id" name="addcoupon" class="dataform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <div id="coupon-name">
+                <table width="615" border="0" cellpadding="0" cellspacing="5" id="couponTable" style="table-layout:fixed;">
+                    <tbody>
+                        <tr>
+                            <td><b>Batch Name</b></td>
+                            <td width="85"><b>Type</b></td>
+                            <td width="85"><b>Value</b></td>
+                            <td width="85"><b>Qualifier</b></td>
+                            <td width="85"><b>Ceiling</b></td>
+                        </tr>
+                        <tr>
+                            <td valign="top"><?php echo $coupon['name']; ?></td>
+                            <td valign="top"><?php echo $coupon['type']; ?></td>
+                            <td valign="top">
+                                <?php
+                                $t1 = count($coupon['discountVal']);
+                                
+                                if($t1){
+                                    for($i1=0;$i1<$t1;$i1++){
+                                        echo $coupon['discountVal'][$i1];
+                                    }
+                                }
+                                ?>
+                            </td>
+                            <td valign="top">
+                                <?php
+                                $t2 = count($coupon['amountQualifier']);
+                                
+                                if($t2){
+                                    for($i2=0;$i2<$t2;$i2++){
+                                        echo $coupon['amountQualifier'][$i2];
+                                    }
+                                }
+                                ?>
+                            </td>
+                            <td valign="top"><?php echo $coupon['ceilingAmount']; ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="apply-coupon">
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td colspan="3"><b>Apply coupon to:</b></td>
+                    </tr>
+                    <tr>
+                        <td><b><i>Apply coupon to</i>:</b><br /><?php echo $this->readotucouponclass; ?></td>
+                        <td><b><i>Site</i>:</b><br /><?php echo $this->readotucouponsite[0]['name']; ?></td>
+                        <td><b><i>Channel Code</i>:</b><br /><?php echo $coupon['channelCode'][0]; ?></td>
+                        <td><b><i>Apply discount to</i>:</b><br /><?php echo $this->readotucouponappliesto; ?></td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><b><i>Owner</i>:</b><br /><?php echo $this->readotucouponowner[0]['owner']; ?></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b><i>Appeasement</i>:</b>
+                            <?php
+                            if($coupon['appeasement']){
+                                echo $coupon['appeasement'];
+                            }else{
+                                echo 'None';
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td colspan="4"><b>Expiration:</b></td>
+                    </tr>
+                    <tr>
+                        <td width="80"><b><i>Start Date</i>:</b></td>
+                        <td width="200"><?php echo date('M d, Y H:i:s a', $expiration['startDate']['sec']); ?></td>
+                        <td width="70"><b><i>End Date</i>:</b></td>
+                        <td><?php echo date('M d, Y H:i:s a', $expiration['endDate']['sec']); ?></td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td colspan="4">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="190"><b><i>Original number of Coupons</i>:</b></td>
+                        <td width="140"><?php echo $this->readotucouponbatch[0]['initial']; ?></td>
+                        <td width="130"><b><i>Number of Unused</i>:</b></td>
+                        <td><?php echo $this->readotucouponbatch[0]['remaining']; ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">&nbsp;</td>
+                    </tr>
+                </table>
+                <div>&nbsp;</div>
+            </div>
+            <div>
+                <b><i>Restrictions</i>:</b> 
+                <?php
+                if($this->readotucoupon[0]['restrictions']){
+                    echo '<a href="/dcms/template/view/templateName/'.$this->readotucoupon[0]['restrictions'].'" target="_blank">'.$this->readotucoupon[0]['restrictions'].'</a>';
+                }else{
+                    echo 'None';
+                }
+                ?>
+            </div>
+            <div>&nbsp;</div>
+            <div><b><i>Status</i>:</b> <?php echo $this->readotucoupon[0]['status']; ?></div>
+        </div>
+        </form>
+    </div>
+</div>

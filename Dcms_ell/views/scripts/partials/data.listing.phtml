@@ -1,0 +1,14 @@
+<?php $view = Zend_Registry::get('view'); ?>
+<?php $__row_style = (($this->partialCounter % 2 ) ? "dark" : "light"); ?>
+
+<tr class="<?php echo $__row_style; ?>">
+
+    <td width="2%"></td>
+    <td width="10%"><?php echo $this->pf_id; ?></td>
+    <td  width="10%"><?php echo $this->pf_code; ?></td>
+    <td  width="10%"><?php echo $this->pf_name; ?></td>
+    <td  width="10%"><?php echo $this->channel_id; ?></td>
+    <td  width="10%"><?php echo $this->brand_name; ?></td>
+    <td  width="10%"><?php echo $this->part_name; ?></td>
+    <td  width="5%"></td>
+</tr>

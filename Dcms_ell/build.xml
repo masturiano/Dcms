@@ -1,0 +1,187 @@
+<project name="Usaptool Module DCMS" default="build" basedir=".">
+    <property name="basedir" value="${project.basedir}" />
+    <property environment="env" />
+
+    <target name="build" depends="profile-env,prepare,composer,lint,pdepend,phploc,phpmd-ci,phpcs-ci-zend,phpcs-ci-phpcompat,phpcs-ci-blame, phpsecaudit,phpcpd,apigen,phpcb,phpunit"/>
+	
+    <target name="profile-env">
+        <exec executable="php" logoutput="true">
+            <arg value="-v" />
+        </exec>
+        <exec executable="phing" logoutput="true">
+            <arg value="-version" />
+        </exec>
+    </target>
+	   
+    <target name="clean" description="Cleanup build artifacts">
+        <delete dir="${basedir}/build/api"/>
+        <delete dir="${basedir}/build/code-browser"/>
+        <delete dir="${basedir}/build/coverage"/>
+        <delete dir="${basedir}/build/logs"/>
+        <delete dir="${basedir}/build/pdepend"/>
+        <delete dir="${basedir}/build/apigen"/>
+        <delete dir="${basedir}/build/phpunit"/>
+        <delete dir="${basedir}/build/phpsecaudit"/>
+        <delete dir="${basedir}/.sonar"/>
+    </target>
+	 
+    <target name="prepare" depends="clean" description="Prepare for build">
+        <mkdir dir="${basedir}/build/api"/>
+        <mkdir dir="${basedir}/build/code-browser"/>
+        <mkdir dir="${basedir}/build/coverage"/>
+        <mkdir dir="${basedir}/build/logs"/>
+        <mkdir dir="${basedir}/build/pdepend"/>
+        <mkdir dir="${basedir}/build/apigen"/>
+        <mkdir dir="${basedir}/build/phpunit"/>
+        <mkdir dir="${basedir}/build/phpsecaudit"/>
+    </target>
+	
+    <target name="lint" description="Perform syntax check of sourcecode files">
+        <phplint haltonfailure="true">
+            <fileset dir="${basedir}">
+                <include name="**/*.php" />
+                <!-- exclude directories, repeat line below to exclude more -->
+                <exclude name="**/tests/**" />
+                <exclude name="**/vendor/**" />
+            </fileset>
+        </phplint>
+    </target>
+
+   <target name="composer" description="Dependency Management Tool">
+       <exec executable="composer.phar" logoutput="true">
+           <arg value="install" />
+       </exec>
+   </target>
+	
+    <target name="phploc" description="Measure project size using PHPLOC">
+        <exec executable="phploc" logoutput="true">
+            <!-- exclude directories, repeat line below to exclude more -->
+            <arg line="--log-csv ${basedir}/build/logs/phploc.csv
+                --exclude ${basedir}/tests
+                --exclude ${basedir}/vendor
+                --exclude ${basedir}/build
+                --exclude ${basedir}/library
+                ${basedir}"
+            />
+        </exec>
+    </target>
+	
+    <target name="pdepend" description="Calculate software metrics using PHP_Depend">
+        <exec executable="pdepend" logoutput="true">
+            <arg line="--ignore=${basedir}/tests,${basedir}/vendor,${basedir}/build,${basedir}/library
+                --jdepend-xml=${basedir}/build/logs/jdepend.xml
+                --summary-xml=${basedir}/build/logs/pdepend.xml
+                --jdepend-chart=${basedir}/build/pdepend/dependencies.svg
+                --overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg
+                ${basedir}"
+            />
+        </exec>
+    </target>
+	
+    <target name="phpmd-ci" description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
+        <exec executable="phpmd" logoutput="true">
+            <arg line="${basedir}
+                xml
+                codesize,design,naming,unusedcode
+                --reportfile ${basedir}/build/logs/pmd.xml
+                --exclude ${basedir}/tests,${basedir}/vendor,${basedir}/build,${basedir}/library"
+            />
+        </exec>
+    </target>
+	
+    <target name="phpcs-ci-zend" description="Find Zend coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
+        <exec executable="phpcs" output="/dev/null" logoutput="true">
+            <arg line="--report=checkstyle
+                --report-file=${basedir}/build/logs/checkstyle-zend.xml
+                --standard=CustomZend
+                --ignore=${basedir}/tests,${basedir}/vendor,${basedir}/build,${basedir}/library
+                --extensions=php,phtml
+                ${basedir}"
+            />
+        </exec>
+    </target>
+
+    <target name="phpcs-ci-phpcompat" description="Find PHPCompatibility coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
+        <exec executable="phpcs" output="/dev/null" logoutput="true">
+            <arg line="--report=checkstyle
+                --report-file=${basedir}/build/logs/checkstyle-phpcompatibility.xml
+                --standard=PHPCompatibility
+                --ignore=${basedir}/tests,${basedir}/vendor,${basedir}/build,${basedir}/library
+                --extensions=php,phtml
+                ${basedir}"
+            />
+        </exec>
+    </target>
+
+    <target name="phpcs-ci-blame" description="Find Zend coding standard violations using PHP_CodeSniffer for GIT BLAME">
+        <exec executable="phpcs" output="/dev/null" logoutput="false">
+            <arg line="-v --report=gitblame
+                --report-file=${basedir}/build/logs/cs-gitblame.txt
+                --standard=CustomZend
+                --ignore=${basedir}/tests,${basedir}/vendor,${basedir}/build,${basedir}/library
+                --extensions=php,phtml
+                ${basedir}"
+            />
+        </exec>
+    </target>
+	
+    <target name="phpcpd" description="Find duplicate code using PHPCPD">
+        <exec executable="phpcpd" logoutput="true">
+            <arg line="--log-pmd ${basedir}/build/logs/pmd-cpd.xml
+                --exclude tests
+                --exclude build
+                --exclude library
+                --exclude vendor
+                ${basedir}"
+            />
+        </exec>
+    </target>
+    
+    <target name="apigen" description="Generate API documentation using APIGEN">
+        <exec executable="apigen.php" logoutput="false">
+            <arg line="--source .
+                --destination=${basedir}/build/apigen
+                --exclude=${basedir}/build
+                --exclude=${basedir}/library
+                --exclude=${basiedir}/vendor
+                --exclude=${basedir}/tests"
+            />
+        </exec>
+    </target>
+
+    <target name="phpunit" description="Run unit tests with PHPUnit">
+        <echo msg="skipped! Need to update test cases." />
+<!--         <exec executable="phpunit" checkreturn="true" logoutput="true">
+            <arg line="-testdox 
+                -configuration ${basedir}/tests/phpunit.xml"
+            />
+        </exec>-->
+    </target>
+	
+    <target name="phpcb" description="Aggregate tool output with PHP_CodeBrowser">
+        <exec executable="phpcb" logoutput="true">
+            <arg line="--log ${basedir}/build/logs
+                --ignore ${basedir}/build
+                --ignore ${basedir}/tests
+                --ignore ${basedir}/vendor
+                --ignore ${basedir}/library
+                --source ${basedir}
+                --output ${basedir}/build/code-browser"
+            />
+        </exec>
+    </target>
+    
+    <target name="phpsecaudit" description="PHP Security Audit Tool">
+        <exec executable="phpsecaudit">
+            <arg line="--src ${basedir}
+                --outdir ${basedir}/build/phpsecaudit
+                --format html
+                --exclude build 
+                --exclude tests
+                --exclude library
+                --exclude vendor"
+            />
+        </exec>
+    </target>
+</project>
+

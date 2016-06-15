@@ -1,0 +1,99 @@
+<style>
+#main .pagination {
+    float: right;
+    text-align: right;
+    width: 620px;
+}
+
+.pagination a {
+    color: #FFFFFF !important;
+}
+
+.pagination .disabled a {
+    color: #737373 !important;
+}
+</style>
+<script>
+function filterRecords(){
+    var batchId = $("#batchId").val();
+    
+    location.href = '/dcms/coupon/couponsecondary/countperpage/<?php echo $this->request['countperpage']; ?>/page/<?php echo $this->request['page']; ?>/batch_id/'+batchId;
+}
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.guest.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="searchbatchs_id" name="searchbatchs" class="datasearchform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponSearchTable">
+                    <tr>
+                        <td valign="top">
+                            Batch Name: <input type="text" id="batchId" name="batchId" value="<?php if(isset($this->request['batch_id'])){echo $this->request['batch_id'];} ?>" />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="button" id="search_btn" name="search_btn" value="Filter" class="uniform" onclick="filterRecords();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="apply-coupon">
+                <div>&nbsp;</div>
+                <div>
+                    Coupon per page: 
+                    <select name="countperpage" onchange="location.href='/dcms/coupon/couponsecondary/countperpage/'+this.value+'/page/<?php echo $this->request['page']; ?>/batch_id/<?php echo $this->request['batch_id']; ?>';">
+                        <?php
+                        $pagecount = 10;
+                        for ($counter = 1; $counter <= 10; $counter++, $pagecount += 10) {
+                            $optionpage = "<option value='{$pagecount}'";
+                            ($this->request['countperpage'] == $pagecount) ? $optionpage .= " selected='selected'" : "";
+                            $optionpage .= ">{$pagecount}</option>";
+                            echo $optionpage;
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div>&nbsp;</div>
+                <?php $pagevars = $this->paginator->getPages(); ?>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2" id="domainTable">
+                    <tr>
+                        <td colspan="4">
+                            <div class="pagination">
+                                <div class="page-info"><?php echo $pagevars->totalItemCount; ?></div>
+                                <?php echo $this->paginationControl($this->paginator, 'Sliding', '/partials/couponsecondarypaginationcontrols.phtml', array('request' => $this->request)); ?>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr style="background-color:#FFEBCD;">
+                        <td><div style="padding:5px;"><b>Batch Name</b></div></td>
+                        <td style="text-align:center;"><div style="padding:5px;"><b>Total No. of Orig Coupon</b></div></td>
+                        <td style="text-align:center;"><div style="padding:5px;"><b>Total No. of used</b></div></td>
+                        <td style="text-align:center;"><div style="padding:5px;"><b>Total No. of unused</b></div></td>
+                    </tr>
+
+                    <?php
+                    if (count($this->paginator)) {
+                        echo $this->partialLoop('partials/couponsecondary.listing.phtml', $this->paginator);
+                    }else{
+                        echo '<tr>
+                            <td colspan="4"><center>No Batches available</center></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">&nbsp;</td>
+                        </tr>';
+                    }
+                    ?>
+
+                    <tr>
+                        <td colspan="4">
+                            <div class="pagination">
+                                <div class="page-info"><?php echo $pagevars->totalItemCount; ?></div>
+                                <?php echo $this->paginationControl($this->paginator, 'Sliding', '/partials/couponsecondarypaginationcontrols.phtml', array('request' => $this->request)); ?>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>

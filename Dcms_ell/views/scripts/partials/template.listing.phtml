@@ -1,0 +1,11 @@
+<tr style="height: 20px; font-size: 13px;">
+    <td style="padding-left: 5px;"><?php echo $this->templateName; ?></td>
+    <td style="padding-left: 5px;"><?php echo ucfirst($this->type); ?></td>
+    <td style="padding-left: 5px;"><?php echo $this->creator; ?></td>
+    <td style="padding-left: 8px;"><a href="/dcms/template/view/id/<?php echo $this->id; ?>" onClick="return popView(this, 'View_Template')">view</a></td>
+    <td style="padding-left: 8px;"><a href="/dcms/template/edit/id/<?php echo $this->id; ?>">edit</a></td>
+    <td style="padding-left: 8px;"><a href="/dcms/template/delete/id/<?php echo $this->id; ?>" onClick="return confirm('Are you sure you want to delete this template?');">delete</a></td>
+</tr>
+
+
+

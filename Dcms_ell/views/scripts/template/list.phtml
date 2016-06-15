@@ -1,0 +1,64 @@
+<style>
+    .bg_btn {
+        background-color: #F6F6F6;
+        border-bottom: 5px solid #555555;
+        border-top: 5px solid #555555;
+        margin-top: 20px;
+        padding: 8px 10px;
+        text-align: right;
+    }
+</style>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+            <h2>Template List</h2>
+            <br />
+            <?php
+            echo $this->form;
+            ?>
+            <br />
+            <br />
+            <div class="messages">
+                <?php echo $this->flashMessages(); ?>
+            </div>         
+                <?php 
+                    $pagevars = $this->paginator->getPages(); ?>
+                <div class="pagination">
+                    <div class="page-info">
+                        <?php echo $pagevars->totalItemCount; ?>
+                    </div>
+
+                    <?php
+                    echo $this->paginationControl($this->paginator, 'Sliding', '/partials/template.paginationcontrols.phtml', array('request' => $this->request));
+                    ?>
+                </div>
+                 <table  class="datatable" width="100%">
+                    <tr style="height: 30px; background: #25609D; color: #FFF; font-size: 12px;">
+                        <td style="padding-left: 5px;"><b>Template Name</b></td>
+                        <td style="padding-left: 5px;"><b>Restriction Type</b></td>
+                        <td style="padding-left: 5px;"><b>Creator</b></td>
+                        <td colspan="3" align="center"><b>Action</b></td>
+                    </tr>
+                    <?php
+                    if (count($this->paginator)) :
+                        echo $this->partialLoop('partials/template.listing.phtml', $this->paginator);
+                    else :
+                        echo "<tr style='height: 16px;' align='center'><td align='center' colspan='5'>No Template found.</td></tr>";
+                    endif;
+                    ?>
+                </table>
+                <div class="pagination">
+                    <div class="page-info">
+                        <?php echo $pagevars->totalItemCount; ?>
+                    </div>
+
+                    <?php
+                    echo $this->paginationControl($this->paginator, 'Sliding', '/partials/template.paginationcontrols.phtml', array('request' => $this->request));
+                    ?>
+                </div>
+            <div class="bg_btn" style="text-align: right;">
+                <input type="button" value="Add New Template" name="add_template" onclick="location.href='/dcms/template/add';" class="uniform" />
+            </div>
+    </div>
+</div>
+<script type="text/javascript" src="/assets/js/jquery/functions.js"></script>

@@ -1,0 +1,29 @@
+<?php
+$killswitch = $this->killswitch;
+?>
+<div class="l1bar">
+    <div class="l1nav">
+        <ul>
+           <?php $_p = $this->pagename; ?>
+            <li<?php if($_p == "dcms.index.homeguest") { echo ' class="active"';}?>>
+                 <a href="/dcms/index/homeguest">Home</a>
+             </li>
+			<li<?php if($_p == "dcms.index.search") { echo ' class="active"';}?>>
+                 <a href="/dcms/index/search">Search</a>
+             </li>
+             <?php
+             if(isset($killswitch['onetimeuse']) && !$killswitch['onetimeuse']) :
+               ?>
+             <li<?php if($_p == "dcms.coupon.couponsecondary" || $_p == "dcms.coupon.otucouponsecondary" || $_p == "dcms.coupon.viewotucoupon") { echo ' class="active"';}?>>
+                 <a href="/dcms/coupon/couponsecondary/">OTU Coupons</a>
+             </li>
+             <?php
+             endif;
+?>
+             
+
+        </ul>
+    </div>
+</div>
+<div class="clear"></div>
+

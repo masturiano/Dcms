@@ -1,0 +1,726 @@
+<?php 
+echo $this->headLink()->prependStylesheet('/assets/css/coupon.css');
+
+if(isset($this->worker)) { ?>
+
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+       <div id="main">
+       <div class="messages"> 
+            <?php echo $this->flashMessages(); ?> 
+            <div id="result"></div>
+             </div> 
+            <?php 
+            
+            //print_r($this->worker);
+echo "Currently processing batch: {$this->worker['batch_name']}";
+echo "<br>";
+echo $this->worker['message'];
+echo "<br>";
+if(isset($this->worker['numerator']) && $this->worker['numerator'] != 0){
+    echo "{$this->worker['numerator']} / {$this->worker['total']} created";
+}
+            ?>
+       </div>
+    </div>
+</div>
+
+    
+<?php 
+
+
+}else{ ?>
+<style>
+.bg_btn{
+    background-color: #F6F6F6;
+    border-bottom: 5px solid #555555;
+    border-top: 5px solid #555555;
+    margin-top: 20px;
+    padding: 8px 10px;
+    text-align: right;
+}
+</style>
+<?php
+
+
+//FIRST COLUMN
+$name            = $this->otucouponupdateform->getElement('name');
+$type            = $this->otucouponupdateform->getElement('type');
+$discountVal     = $this->otucouponupdateform->getElement('discountVal');
+$amountQualifier = $this->otucouponupdateform->getElement('amountQualifier');
+$ceilingAmount   = $this->otucouponupdateform->getElement('ceilingAmount');
+$plus            = $this->otucouponupdateform->getElement('plus');
+$minus           = $this->otucouponupdateform->getElement('minus');
+$hidden          = $this->otucouponupdateform->getElement('last_coupon_field_id');
+//END OF FIRST COLUMN
+
+//SECOND COLUMN
+$class           = $this->otucouponupdateform->getElement('class');
+$siteId          = $this->otucouponupdateform->getElement('siteId');
+$channelCode     = $this->otucouponupdateform->getElement('channelCode');
+$couponAppliesTo = $this->otucouponupdateform->getElement('couponAppliesTo');
+//END OF SECOND COLUMN
+
+//THIRD COLUMN
+$owner = $this->otucouponupdateform->getElement('owner');
+//END OF THIRD COLUMN
+
+//FOURTH COLUMN
+$appeasement = $this->otucouponupdateform->getElement('appeasement');
+//END OF FOURTH COLUMN
+
+//FIFTH COLUMN
+$startDate = $this->otucouponupdateform->getElement('startDate');
+$endDate   = $this->otucouponupdateform->getElement('endDate');
+//END OF FIFTH COLUMN
+
+//SEVENTH COLUMN
+$initialQuantityHidden   = $this->otucouponupdateform->getElement('initialQuantityHidden');
+$remainingQuantityHidden = $this->otucouponupdateform->getElement('remainingQuantityHidden');
+$initialQuantity         = $this->otucouponupdateform->getElement('initialQuantity');
+$remainingQuantity       = $this->otucouponupdateform->getElement('remainingQuantity');
+$setUnused               = $this->otucouponupdateform->getElement('setUnused');
+//END OF SEVENTH COLUMN
+
+//EIGHTH COLUMN
+$enabledisable_restrictions = $this->otucouponupdateform->getElement('enabledisable_restrictions');
+$restrictions               = $this->otucouponupdateform->getElement('restrictions');
+//END OF EIGHTH COLUMN
+
+//NINETH COLUMN
+$publish = $this->otucouponupdateform->getElement('publish');
+//END OF NINETH COLUMN
+
+//BUTTONS
+$cancel        = $this->otucouponupdateform->getElement('cancel');
+$coupon_update = $this->otucouponupdateform->getElement('coupon_update');
+//END OF BUTTONS
+
+$description = $this->otucouponupdateform->getElement('description');
+$generate = $this->otucouponupdateform->getElement('generate');
+
+# Name: Del # Date Modify: April, 2015 #Start
+$dispense = $this->otucouponupdateform->getElement('dispense');
+$dispenseHidden = $this->otucouponupdateform->getElement('dispenseHidden');
+$gated = $this->otucouponupdateform->getElement('gated');
+$gatedHidden = $this->otucouponupdateform->getElement('gatedHidden');
+$lowerLimit = $this->otucouponupdateform->getElement('lowerLimit');
+$lowerLimitHidden = $this->otucouponupdateform->getElement('lowerLimitHidden');
+# Name: Del # Date Modify: April, 2015 #End
+
+?>
+<script type="text/javascript">
+$(document).ready(function() {
+    // enableDisable();
+    $("#restrictions").attr("disabled", true);
+});
+    
+if(typeof String.prototype.trim !== 'function') {   String.prototype.trim = function() {     return this.replace(/^\s+|\s+$/g, '');    } }
+
+var coupon_name = {};
+coupon_name.id = "<?php echo $name->getId(); ?>";
+
+var type = {};
+type.id = "<?php echo $type->getId(); ?>";
+type.label = "<?php echo $type->getLabel(); ?>";
+
+var discountVal = {};
+discountVal.id = "<?php echo $discountVal->getId(); ?>";
+discountVal.label = "<?php echo $discountVal->getLabel(); ?>";
+
+var amountQualifier = {};
+amountQualifier.id = "<?php echo $amountQualifier->getId(); ?>";
+amountQualifier.label = "<?php echo $amountQualifier->getLabel(); ?>";
+
+var ceilingAmount = {};
+ceilingAmount.id = "<?php echo $ceilingAmount->getId(); ?>";
+ceilingAmount.label = "<?php echo $ceilingAmount->getLabel(); ?>";
+
+var endDate = {};
+endDate.id = "<?php echo $endDate->getId(); ?>";
+endDate.label = "<?php echo $endDate->getLabel(); ?>";
+
+var setUnused = {};
+setUnused.id = "<?php echo $setUnused->getId(); ?>";
+setUnused.label = "<?php echo $setUnused->getLabel(); ?>";
+
+var generate = {};
+generate.id = "<?php echo $generate->getId(); ?>";
+generate.label = "<?php echo $generate->getLabel(); ?>";
+
+var publish = {};
+publish.id = "<?php echo $publish->getId(); ?>";
+publish.label = "<?php echo $publish->getLabel(); ?>";
+
+// # Name: Del # Date Modify: April 2016 #Start
+var dispense = {};
+dispense.id = "<?php echo $dispense->getId(); ?>";
+dispense.label = "<?php echo $dispense->getLabel(); ?>";
+
+var gated = {};
+gated.id = "<?php echo $gated->getId(); ?>";
+gated.label = "<?php echo $gated->getLabel(); ?>";
+// # Name: Del # Date Modify: April 2016 #End
+
+var oneTimeUseLimit = parseInt(<?php echo $this->oneTimeUseLimit; ?>);
+
+var errorHandler = {};
+    errorHandler.NOT_EMPTY = "should not be empty";
+    errorHandler.NUMBER_NOT_GREATER_THAN = "should not be greater than";
+    errorHandler.INVALID_DAY_OF_MONTH = "Invalid day for the selected month: ";
+    errorHandler.NUMBER_NOT_EQUAL = "should not be equal";
+    errorHandler.IS_NUMERIC = "should be numeric";
+    errorHandler.INVALID_DATE_END_AHEAD_OF_START = "Start date should not be ahead of End date";
+    errorHandler.INVALID_DATE_NOT_EQUAL = "Dates should not be equal";
+    errorHandler.INVALID_DATE = "These coupon is already expired";
+    errorHandler.COUPON_EXISTS = "Coupon with this name already exists";
+    errorHandler.INVALID_CHAR = "Special Chars not allowed";
+    errorHandler.NOT_ZERO = "Should not be 0 (zero)";
+    errorHandler.PERCENT_NOT_GREATER_THAN = "should not be greater than 100";
+    errorHandler.CEILING_GREATER_THAN_VALUES = "Ceiling should be greater than or equal the discount values";
+    errorHandler.VALUES_LESS_THAN_CEILING = "Discount values should not be greater than the ceiling";
+    errorHandler.WORKER_UNAVAILABLE = "Could not create coupon more than " + oneTimeUseLimit + " as the system is currently generating a large number of One Time Use Coupons for Batch: ";
+    
+    errorHandler.VALUE_LESS_THAN_QUALIFIER = "VALUE should not be greater than the qualifier";
+    errorHandler.VALUE_QUALIFIER_NOT_SAME = "Value qualifier/s inputted should not be the same";
+        errorHandler.GENERATE_BEFORE_PUBLISH = "Generate this batch before you can publish";
+var intRegex = /^\d+$/;
+var floatRegex = /^((\d+(\.\d *)?)|((\d*\.)?\d+))$/;
+
+function validateForm(){
+    try{
+    var countError = 0;
+    
+
+    var valueCounter = 0;
+   
+    var setUnusedCounter = 0;
+    document.getElementById('setUnused').value = removeLeadingZero(document.getElementById('setUnused').value);
+    if(document.getElementById('setUnused').value==""){
+        $("#setUnused").addClass('errorFocus');
+        $('.'+setUnused.id).html(setUnused.label + " " + errorHandler.NOT_EMPTY);
+        setUnusedCounter = 1;
+    }else{
+        var inputValue = $("#setUnused").val();
+        if(!intRegex.test(inputValue) || !floatRegex.test(inputValue)) {
+            $("#setUnused").addClass('errorFocus');
+            $('.'+setUnused.id).html(setUnused.label + " " + errorHandler.IS_NUMERIC);
+            setUnusedCounter = 1;
+        }
+        
+        
+    }
+
+    countError = countError+setUnusedCounter;
+    
+    
+    if($("#"+publish.id).is(":checked")){
+        if($("#"+generate.id).is(":checked")){
+            removeError(generate);
+        }else{
+            showError(generate,errorHandler.GENERATE_BEFORE_PUBLISH);
+            countError++;
+        }
+    }
+    
+    if(countError>0){
+        return false;
+    }else{
+        return true;
+    }
+    }catch(error){
+        alert(error);
+    return false;
+    }
+}
+function showError(element, error){
+    //$(element).addClass('errorFocus');
+    $('.'+element.id).html(error);
+}
+
+function removeError(element){
+    //$(element).removeClass('errorFocus');
+    $('.'+element.id).html("");
+}
+function isInt(value){
+    return (intRegex.test(value) || floatRegex.test(value));
+}
+//ticket #333 - Able to input numeric values which starts with zero in Number of coupons[One time use coupon] Add/Edit One time use coupon entry
+//gconstantino 11/14/2012
+//start
+function removeLeadingZero(value){
+    return value.replace(/^[0]+/g,"");
+}
+//end
+function checkWorkerStatus(qtyElement){
+    var quantity = parseInt(qtyElement.value.trim());
+    var errorCounter = 0;
+    if(quantity > oneTimeUseLimit){
+        $.ajax({
+                url: "/dcms/otucoupon/checkstatus/format/json",
+                type: "GET",
+                datatype: "json",
+                async: false,
+                success: function(data){
+                        if(typeof data =='object'){
+                            if(data.status && data.status != "done"){
+                                errorCounter = 1;
+                                showError(qtyElement,errorHandler.WORKER_UNAVAILABLE + data.batch_name);
+                            }else{
+                                errorCounter = 0;
+                                removeError(qtyElement);
+                            }
+                        }else{
+                            errorCounter = 1;
+                            showError(qtyElement,"Session expired.");
+
+                        }
+                    },
+                error: function(err){
+                    errorCounter = 1;
+                }
+
+        }); 
+    }else{
+        errorCounter = 0;
+    }
+        
+        return errorCounter;
+    }
+    
+function checkIfEmpty(input, append){
+    var append = (append == null) ? "" : append;
+    var inputValue = $(append+'#'+input.id).val();
+    if(inputValue == ""){
+        $(append+'#'+input.id).addClass('errorFocus');
+        $(append+'.'+input.id).html(input.label + " " + errorHandler.NOT_EMPTY);
+        return 1;
+    }else{
+        $(append+'#'+input.id).removeClass('errorFocus');
+        $(append+'.'+input.id).html("");
+        return 0;
+    }
+}
+
+function bc_SplitTableRow(theLink) {
+    var table = document.getElementById("couponTable");
+
+    if(table.rows.length == 10){ 
+        return false;
+    }
+    
+    theRow   = theLink.parentNode.parentNode;
+    theBod   = theRow.parentNode;
+    theTable = theRow.parentNode;
+    newRow   = theRow.cloneNode(true);
+    
+    try{
+        new_id = Number(jQuery('#last_coupon_field_id').val())+1;
+        $('#'+discountVal.id, newRow).val("");
+        $('#'+amountQualifier.id, newRow).val("");
+        $('#'+coupon_name.id, newRow).remove();
+        $('#'+type.id, newRow).remove();
+        $('#'+ceilingAmount.id, newRow).remove();
+        newRow.cells[4].innerHTML = "";
+        jQuery('#last_coupon_field_id').val(new_id);
+
+        theBod.appendChild(newRow);
+        jQuery("#minus").css("display", "block");
+    }catch(error){
+        alert(error);
+    }
+
+    return false;
+}
+
+function deleteRow(i){
+    var table = document.getElementById("couponTable");
+    if(table.rows.length == 2){
+        alert('Cannot delete all discounts');
+    } else if(i == 1){
+        return false;
+    }
+    else{
+        document.getElementById('couponTable').deleteRow(i);
+    }
+}
+
+function checkNumber(val) {
+    var strPass = val.value;
+    var strLength = strPass.length;
+    var lchar = val.value.charAt((strLength) - 1);
+    var cCode = CalcKeyCode(lchar);
+
+    if ((cCode < 48 || cCode > 57) && cCode != 46) {
+        var myNumber = val.value.substring(0, (strLength) - 1);
+        val.value = myNumber;
+    }
+    return false;
+}
+
+function CalcKeyCode(aChar) {
+    var character = aChar.substring(0,1);
+    var code = aChar.charCodeAt(0);
+    return code;
+}
+
+function enableDisable(){
+    if(document.getElementById('enabledisable_restrictions').checked==true){
+        $("#restrictions").attr("disabled", false);
+    }else{
+        $("#restrictions").attr("disabled", true);
+    }
+}
+
+function computeQuantity(input){
+    checkNumber(input);
+    
+    var inputData = Math.floor($("#"+input.id).val());
+    var remainingQuantity = Math.floor($("#remainingQuantityHidden").val()) + inputData;
+    var initialQuantity = Math.floor($("#initialQuantityHidden").val()) + inputData;
+    
+    if(isNaN(inputData)==false){
+        document.getElementById('remainingQuantity').value = remainingQuantity;
+        document.getElementById('initialQuantity').value   = initialQuantity;
+    }else{
+        document.getElementById('remainingQuantity').value = document.getElementById('remainingQuantityHidden').value;
+        document.getElementById('initialQuantity').value   = document.getElementById('initialQuantityHidden').value;
+    }
+}
+
+function letternumber(e, checkNumber)
+{
+    var key;
+    var keychar;
+
+    if (window.event)
+        key = window.event.keyCode;
+    else if (e)
+        key = e.which;
+    else
+        return true;
+    keychar = String.fromCharCode(key);
+    keychar = keychar.toLowerCase();
+
+    // control keys
+    if ((key==null) || (key==0) || (key==8) || 
+        (key==9) || (key==13) || (key==27) )
+        return true;
+
+    var isNumber = (key >= 48 && key <= 57);
+    var isLowerCaseLetter = (key >=97 && key <= 122);
+    var isUCaseLetter = (key >= 65 && key <= 90);
+
+    
+    if (typeof(checkNumber) != 'undefined' && checkNumber !== null){
+        if(isNumber){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        if (isLowerCaseLetter ||
+            isUCaseLetter ||
+            isNumber
+        ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+        
+}
+
+function viewTemplate(link,windowName,id){
+    var templateId = $("select#"+id+" option:selected").val();
+    var params;
+    params = 'width='+screen.width;
+    params += ', height='+screen.height;
+    params += ', top=0, left=0';
+    params += ', fullscreen=yes, scrollbars=yes';
+    
+    window.open(link.href+""+templateId, windowName, params);
+    //popView(link.href+""+templateId, windowName)
+    return false;
+}
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="addcoupon_id" name="addcoupon" class="dataform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            Please be advised that the system converts the date you will set to <b><?php echo $this->timezone;  ?></b> timezone.
+            <br />
+            <br />
+            <div class="messages"> 
+            <?php 
+            if(isset($this->workerResult)){
+                //echo $this->workerResult;
+                echo '<ul id="flash-messages">
+                    <li class="flash-info">'.$this->workerResult.'</li>
+                    </ul>';
+            }else{
+                echo $this->flashMessages();
+            }
+             ?> 
+             </div> 
+            <div id="coupon-name">
+                <table width="615" border="0" cellpadding="0" cellspacing="5" id="couponTable" style="table-layout:fixed;">
+                    <tbody>
+                        <tr>
+                            <td width="150"><?php echo $name->getLabel(); ?></td>
+                            <td width="85"><?php echo $type->getLabel(); ?></td>
+                            <td width="85"><?php echo $discountVal->getLabel(); ?></td>
+                            <td width="85"><?php echo $amountQualifier->getLabel(); ?></td>
+                            <td width="85"><?php echo $ceilingAmount->getLabel(); ?></td>
+                            <td width="15">&nbsp;</td>
+                            <td width="15">&nbsp;</td>
+                        </tr>
+                        <?php
+                        $t = count($this->readotucoupons['coupon']['discountVal']);
+                        for($i=0;$i<$t;$i++){
+                            if($i<=0){
+                                ?>
+                                <tr>
+                                    <td valign="top"><?php echo $name; ?></td>
+                                    <td valign="top"><?php echo $type; ?></td>
+                                    <td valign="top">
+                                        <?php
+                                        $discountVal->setValue($this->readotucoupons['coupon']['discountVal'][$i]);
+                                        echo $discountVal;
+                                        ?>
+                                    </td>
+                                    <td valign="top">
+                                        $<?php
+                                        $amountQualifier->setValue($this->readotucoupons['coupon']['amountQualifier'][$i]);
+                                        echo $amountQualifier;
+                                        ?>
+                                    </td>
+                                    <td valign="top">$<?php echo $ceilingAmount; ?></td>
+                                    <td valign="top" align="center"><?php //echo $plus; ?></td>
+                                    <td valign="top" align="center"><?php //echo $minus; ?></td>
+                                </tr>
+                                <?php
+                            }else{
+                                ?>
+                                <tr>
+                                    <td valign="top">&nbsp;</td>
+                                    <td valign="top">&nbsp;</td>
+                                    <td valign="top">
+                                        <?php
+                                        $discountVal->setValue($this->readotucoupons['coupon']['discountVal'][$i]);
+                                        echo $discountVal;
+                                        ?>
+                                    </td>
+                                    <td valign="top">
+                                        $<?php
+                                        $amountQualifier->setValue($this->readotucoupons['coupon']['amountQualifier'][$i]);
+                                        echo $amountQualifier;
+                                        ?>
+                                    </td>
+                                    <td valign="top">&nbsp;</td>
+                                    <td valign="top" align="center"><?php //echo $plus; ?></td>
+                                    <td valign="top" align="center"><?php //echo $minus; ?></td>
+                                </tr>
+                                <?php
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+                <table width="615" border="0" cellpadding="0" cellspacing="5" id="couponErrorTable" style="table-layout:fixed; display:none;">
+                    <tbody>
+                        <tr>
+                            <td width="150">&nbsp;</td>
+                            <td width="85">&nbsp;</td>
+                            <td width="85" valign="top"><div class="error <?php echo $discountVal->getId(); ?>"></div></td>
+                            <td width="85" valign="top"><div class="error <?php echo $amountQualifier->getId(); ?>"></div></td>
+                            <td width="85" valign="top"><div class="error <?php echo $ceilingAmount->getId(); ?>"></div></td>
+                            <td width="15">&nbsp;</td>
+                            <td width="15">&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table width="615" border="0" cellpadding="0" cellspacing="5" id="couponTable" style="table-layout:fixed;">
+                    <tbody>
+                 <tr>
+                            <td width="150" colspan="2"><?php echo $description->getLabel(); ?></td>
+                            <td width="85">&nbsp;</td>
+                            <td width="85">&nbsp;</td>
+                            <td width="85">&nbsp;</td>
+                            <td width="15">&nbsp;</td>
+                            <td width="15">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" colspan="2"><?php echo $description; ?><div class="error <?php echo $description->getId(); ?>"></div></td>
+                            <td valign="top">&nbsp;</td>
+                            <td valign="top">&nbsp;</td>
+                            <td valign="top">&nbsp;</td>
+                            <td valign="top">&nbsp;</td>
+                            <td valign="top">&nbsp;</td>
+                        </tr>
+                  </tbody>
+                </table>
+                <?php echo $hidden; ?>
+            </div>
+            <div id="apply-coupon">
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td colspan="3"><b>Apply coupon to:</b></td>
+                    </tr>
+                    <tr>
+                        <td><?php echo $class->getLabel()."<br>".$class; ?></td>
+                        <td><?php echo $siteId->getLabel()."<br>".$siteId; ?></td>
+                        <td><?php echo $channelCode->getLabel()."<br>".$channelCode; ?></td>
+                        <td><?php echo $couponAppliesTo->getLabel()."<br>".$couponAppliesTo; ?></td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><?php echo $owner->getLabel()."<br>".$owner; ?></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><?php echo $appeasement->getLabel()." ".$appeasement; ?></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td colspan="4"><b>Expiration:</b></td>
+                    </tr>
+                    <tr>
+                        <td width="70"><?php echo $startDate->getLabel(); ?></td>
+                        <td width="200"><?php echo $startDate; ?></td>
+                        <td width="70"><?php echo $endDate->getLabel(); ?></td>
+                        <td><?php echo $endDate; ?></td>
+                    </tr>
+                    <tr>
+                        <td width="70">&nbsp;</td>
+                        <td width="200">&nbsp;</td>
+                        <td width="70">&nbsp;</td>
+                        <td valign="top"><div class="error <?php echo $endDate->getId(); ?>"></div></td></td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td colspan="4">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td width="29%"><?php echo $initialQuantity->getLabel(); ?></td>
+                        <td width="15%">
+                            <?php
+                            echo $initialQuantity;
+                            echo $initialQuantityHidden;
+                            ?>
+                        </td>
+                        <td width="20%"><?php echo $remainingQuantity->getLabel(); ?></td>
+                        <td width="36%">
+                            <?php
+                            echo $remainingQuantity;
+                            echo $remainingQuantityHidden;
+                            ?>
+                        </td>
+                    </tr>
+                    </tr>
+                    <tr>
+                        <td colspan="6">&nbsp;</td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2">
+                    <tr>
+                        <td width="100"><?php echo $setUnused->getLabel(); ?></td>
+                        <td width="100"><?php echo $setUnused; ?></td>
+                        <td width="198"><?php echo $lowerLimit->getLabel(); ?></td>
+                        <td width="20" colspan="2">
+                            <?php
+                            echo $lowerLimit;
+                            echo $lowerLimitHidden;
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="100"></td>
+                        <td width="70" colspan="2"><div class="error <?php echo $setUnused->getId(); ?>"></div></td>
+                        <td width="120"></td>
+                        <td width="80"></td>
+                    </tr>
+                </table>
+                <div>&nbsp;</div>
+            </div>
+            <div id="include-exclude">
+                <div style="clear:both;"></div>
+                <ul class="tab">
+                    <li class="active" style=""><a href="#tab1"><b>Restrictions</b></a></li>
+                </ul>
+                <div class="lists">       
+                    <div style="float: left; display: block; " id="tab1" class="tab_content">
+                        <div id="left-variable">
+                            <div style="width:600px;">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><?php echo $enabledisable_restrictions->getLabel()." ".$enabledisable_restrictions; ?> &nbsp; </td>
+                                            <td><?php echo $restrictions; ?></td>
+                                            <td>
+                                                <?php // print_r($this->readotucoupons); ?>
+                                                    <div id="viewTemplate" style="<?php echo ($this->readotucoupons['restrictions'] != "") ? "display:block" : "display:none" ?>">
+                                                        <a style='cursor:pointer' href="/dcms/template/view/tid/" 
+                                                           onclick='return viewTemplate(this, "viewTemplate", "<?php echo $restrictions->getId(); ?>");'>
+                                                            <u>view</u>
+                                                        </a>
+                                                    </div>    
+                                                </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>&nbsp;</div>
+           <div align="right">
+                <?php echo $generate->getLabel()." ".$generate; ?>
+                <br>
+                <br>
+                <?php echo $publish->getLabel()." ".$publish; ?>
+                <div class="error <?php echo $generate->getId(); ?>"></div>
+                <?php
+                if($dispenseHidden->getvalue() == 1){
+                ?>
+                    <br/>
+                    <?php  
+                        echo $dispense->getLabel()." ".$dispense; 
+                        echo $dispenseHidden->getLabel()." ".$dispenseHidden; 
+                    ?>
+                    <?php 
+                        echo $gated;
+                        echo $gatedHidden;
+                    ?>
+                    <br><br><br><br>
+                    <?php
+                        if(isset($this->layout()->nav))
+                        {
+                            echo "Dispense URI: ".$this->layout()->nav; 
+                        }
+                    ?>
+                <?php
+                }
+                ?>
+            </div>
+            <div>&nbsp;</div>
+            <div class="bg_btn"><?php echo $cancel.' '.$coupon_update; ?></div>
+        </div>
+        </form>
+    </div>
+</div>
+<?php }?>    

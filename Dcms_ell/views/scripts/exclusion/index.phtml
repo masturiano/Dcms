@@ -1,0 +1,131 @@
+<style>
+.bg_btn{
+    background-color: #F6F6F6;
+    border-bottom: 5px solid #555555;
+    border-top: 5px solid #555555;
+    margin-top: 20px;
+    padding: 8px 10px;
+    text-align: right;
+}
+
+.ui-multiselect li span.ui-icon-arrowthick-2-n-s{
+    display: none;
+}
+
+.ui-multiselect div.selected[style]{
+    width:368px !important;
+}
+
+.ui-multiselect div.available[style]{
+    width:240px !important;
+}
+</style>
+<script type="text/javascript">
+//RUN GET EXCLUSIONS
+$(document).ready(function() {
+    getExclusions("");    
+});
+//RUN GET EXCLUSIONS
+    
+//GET EXCLUSIONS
+function getExclusions(val){
+    if(val==""){ val = "nodata"; }
+    
+    if(val.length<2){
+        val = "nodata";
+    }
+    
+    jQuery.ajax({
+        type: 'POST',
+        url: "/dcms/exclusion/ajax/?action=getexclusions&brand_name="+val,
+        data:  jQuery("#exclusionform_id").serialize(),
+
+        success: function(data) {
+            jQuery("#records_tab_wrapperonly").html(data);
+            jQuery('#results').fadeIn(200);
+            
+            if(val!="nodata"){
+                $('.search').val(val);
+            }
+        }
+    });
+}
+//END OF GET EXCLUSIONS
+
+//ADD/REMOVE BRAND
+function addBrand(){
+    var brandName = $("#brandName").val();
+//    alert($("#brands").val());
+    if(brandName!=""){
+        if(jQuery.inArray(brandName, $("#brands").val())=="-1"){
+            $("#brands").append('<option selected="selected" value="'+brandName+'">'+brandName+'</option>');
+            $(".selected .connected-list").append('<li class="ui-state-default ui-element ui-draggable" title="'+brandName+'" style="display: block;"><span class="ui-icon-arrowthick-2-n-s ui-icon"></span>'+brandName+'<a class="action" href="#"><span class="ui-corner-all ui-icon ui-icon-minus" onclick="removeBrand(\''+brandName+'\');"></span></a></li>');
+
+            $("#brandName").val("");
+        }else{
+            alert(brandName+": Already exist!");
+        }
+    }
+}
+
+//function matchSelectedBrands(value) {
+//    
+//    var matchString = value;
+//    var rslt = null;
+//    $.each();
+//}
+
+function removeBrand(val){
+    $('#brands option[value=\''+val+'\']').remove();
+    $("#brands").append('<option value="'+val+'">'+val+'</option>');
+    
+    $('.selected .connected-list li[title=\''+val+'\']').remove();
+}
+//END OF ADD/REMOVE BRAND
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="exclusionform_id" name="exclusionform" class="dataform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponTable">
+                    <tr>
+                        <td>
+                            Websites: 
+                            <select id="siteId" name="siteId" onchange="getExclusions($('.search').val());">
+                                <?php
+                                $rec = $this->readsites;
+                                $t = count($rec);
+
+                                if(trim($t)){
+                                    for($i=0; $i<$t; $i++){
+                                        $optionpage1 = "<option value='{$rec[$i]['siteId']}'";
+                                        ($this->readsite == $rec[$i]['siteId']) ? $optionpage1 .= " selected='selected'" : "";
+                                        $optionpage1 .= ">{$rec[$i]['name']}</option>";
+                                        echo $optionpage1;
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><b>Add brand that is not in the list:</b> <input type="text" id="brandName" style="width:150px;" class="uniform text" name="brandName" maxlength="50" /> <input type="button" value="Add Brand" id="brand_add" name="brand_add" class="uniform" onclick="addBrand();" /></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                <div id="results">
+                    <div id="records_tab_wrapperonly"></div>
+                </div>
+            </div>
+            <div class="bg_btn"><input type="submit" value="Save Exclusion" id="exclusion_save" name="exclusion_save" class="uniform" /></div>
+        </div>
+        </form>
+    </div>
+</div>

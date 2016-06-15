@@ -1,0 +1,9 @@
+controller = /var/www/html/Dcms_ell/controllers/TemplateController.php
+views = /var/www/html/Dcms_ell/views/scripts/template/add.phtml
+forms = /var/www/html/Dcms_ell/forms/Template/Addedit.php
+service = /var/www/html/Dcms_ell/services/Template.php
+v2d2 = /data/www/html/svn-exports/services/tools_team/Coupon2-CURRENT/v2d2/Coupon2.php
+object.ini = /data/www/html/svn-exports/services/tools_team/Coupon2-CURRENT/v2d2/object.ini
+
+coupon_dispenser
+template

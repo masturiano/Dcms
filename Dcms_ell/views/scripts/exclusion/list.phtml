@@ -1,0 +1,467 @@
+<style>
+.bg_btn{
+    background-color: #F6F6F6;
+    border-bottom: 5px solid #555555;
+    border-top: 5px solid #555555;
+    margin-top: 20px;
+    padding: 8px 10px;
+    text-align: right;
+}
+
+.ui-multiselect li span.ui-icon-arrowthick-2-n-s{
+    display: none;
+}
+
+.ui-multiselect div.selected[style]{
+    width:368px !important;
+}
+
+.ui-multiselect div.available[style]{
+    width:240px !important;
+}
+</style>
+<script type="text/javascript" src="/assets/js/jquery/functions.js"></script>
+<script type="text/javascript">
+
+    var alphaNumericRegex = /^[A-Za-z0-9 ]{3,20}$/;   
+    var searchKeyword = "search";
+    var beforeSearch = "";
+    var pagesize = 20;
+    var offsetPage = 0;
+    
+    var offsetHash = {};
+    offsetHash.RESTRICTION_BRAND_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE = 0;   
+
+    var searchHash = {};
+    searchHash.RESTRICTION_BRAND_LIST_SEARCH = "search";
+
+    $(document).ready(function() {
+        siteMasterBrandLoader(populateList);
+    });
+
+    function siteMasterBrandLoader(functionParam) {
+        var website = $("#siteId").val();
+        
+        loadElement(
+            "#dummy-loader",
+            "/dcms/exclusion/exclusionlist",
+            "post", 
+            {site_id:website},
+            functionParam, 
+            MESSAGE_LOADING, 
+            'html',
+            "#restriction_brand_selected"
+        );
+    }
+    
+    function getExclusions() {
+        
+        $("#restriction_brand_list").empty();
+        $("#restriction_brand_selected").empty();
+        
+        offsetHash.RESTRICTION_BRAND_LIST_OFFSET_SIZE = 0;
+        offsetHash.RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE = 0;   
+        searchHash.RESTRICTION_BRAND_LIST_SEARCH = "search";
+        
+        siteMasterBrandLoader(newSearchBox);
+    }
+    
+    function newSearchBox() {
+
+        var brandSearch = $('#restriction_brand_selector_search').val();
+        $('#restriction_brand_selector_search').val("");
+        if(trimValue(brandSearch) == "search brand") {
+            brandSearch = "";
+        }
+        
+        searchBox(
+                'direct',
+                brandSearch, 
+                "#dummy-loader", 
+                "brandlist", 
+                'RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_BRAND_LIST_SEARCH', 
+                'RESTRICTION_BRAND_LIST_OFFSET_SIZE',
+                "#restriction_brand_list",
+                "#restriction_brand_selected"
+            ); 
+    }
+
+
+    function populateList() {
+        
+        var elementToPopulate = {elementId:"#restriction_brand_list", 
+                    elementOffsetSize:"RESTRICTION_BRAND_LIST_OFFSET_SIZE", 
+                    method:"brandlist",
+                    selectedData: getAllSelectedValues("#restriction_brand_selected")
+                }
+
+        var size = getSelectOptionSize(elementToPopulate.elementId);
+        
+        if(size <= 0) {    
+            var objElement = getObjectElementValue(offsetHash, elementToPopulate.elementOffsetSize);
+
+            offsetHash[objElement.elm] = 0;
+            offsetPage = offsetHash[objElement.elm];
+            if(objElement != false) {
+                loadElement("#dummy-loader", 
+                    "/dcms/template/" + elementToPopulate.method, 
+                    "post", 
+                    (elementToPopulate.hasOwnProperty('selectedData')) ?
+                        {offset:offsetPage,pagesize:pagesize, element:elementToPopulate.elementId, selected:elementToPopulate.selectedData} :
+                        {offset:offsetPage,pagesize:pagesize, element:elementToPopulate.elementId} ,
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    elementToPopulate.elementId
+                );
+                offsetHash[objElement.elm] = objElement.elvalue + pagesize;
+            }
+        }
+    }
+
+    function getObjectElementValue(object, objElement) {
+
+        if(object.hasOwnProperty(objElement)) {
+            return {elm:objElement, elvalue:object[objElement]};
+        } else {
+            return false;
+        }
+    }
+
+    function searchBox(searchType, value, element, method, offsetSearchType, searchKeywordList, offsetList, dynamicElement, selectedDataElement, evt) {
+    
+        if(typeof(evt) != 'undefined' && evt !== null){
+            var charCode;
+            
+            if(evt == 13 || evt == "13") {
+                charCode = 13;
+            } else {
+                evt = (evt) ? evt : event;
+                charCode = (evt.charCode) ? evt.charCode : ((evt.keyCode) ? evt.keyCode : ((evt.which) ? evt.which : 0));
+            }
+            if(charCode != 13) {
+                return false;
+            }
+        }      
+                
+        var objElementSearchHash = getObjectElementValue(searchHash, searchKeywordList);
+        searchHash[objElementSearchHash.elm] = searchKeyword;//beforeSearch
+        
+        var objElementOffsetHash = getObjectElementValue(offsetHash, offsetSearchType);
+        var objElementListOffsetHash = getObjectElementValue(offsetHash, offsetList)
+       
+        if(searchHash[objElementSearchHash.elm] != value) {//beforeSearch
+            offsetHash[objElementOffsetHash.elm] = 0;
+            offsetPage = 0;
+            offsetHash[objElementListOffsetHash.elm] = 0;
+            searchKeyword = value;
+        } else {
+            if(searchType == 'direct') {
+                
+                offsetHash[objElementOffsetHash.elm] = 0;
+                offsetPage = offsetHash[objElementOffsetHash.elm];
+            } else {
+                offsetHash[objElementOffsetHash.elm] = objElementOffsetHash.elvalue + pagesize;
+                offsetPage = offsetHash[objElementOffsetHash.elm];                                                
+            }
+        }
+        
+        var loadParam = [];
+
+            loadParam = {
+                post:searchKeyword, 
+                offset:offsetPage, 
+                pagesize:pagesize, 
+                search:true, 
+                element:dynamicElement, 
+                selected:getAllSelectedValues(selectedDataElement)
+            };
+        
+        loadElement(
+            element,
+            "/dcms/template/" + method, 
+            "post", 
+            loadParam, 
+            null, 
+            MESSAGE_LOADING, 
+            'html',
+            dynamicElement
+        );
+    }
+
+    /**
+     * @param string    value
+     * @param string    elementId
+     * @param string    method
+     * @param string    offsetType
+     * @param boolean   loadNewList
+     * @param string    newListElementId
+     */
+    function callList(value, element, method, offsetType, selectedDataElement) {
+
+        if(value == 'append') {
+            var objElement = getObjectElementValue(offsetHash, offsetType);
+            if(objElement != false) {
+                 $("#" + element +' option:selected').remove();
+                 loadElement("#dummy-loader", 
+                    "/dcms/template/" + method, 
+                    "post", 
+                    {offset:objElement.elvalue,pagesize:pagesize, element:"#" + element, selected:getAllSelectedValues(selectedDataElement)}, 
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    "#" + element
+                );
+                offsetHash[objElement.elm] = objElement.elvalue + pagesize;
+            }
+        } else if(value == 'append-search-brand-list'){
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_brand_selector_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_BRAND_LIST_SEARCH', 
+                'RESTRICTION_BRAND_LIST_OFFSET_SIZE',
+                "#" + element
+            ); 
+        } else {            
+            return false;
+        }
+    }
+    
+    function addBrand(){
+
+        var brandName = trimValue($("#brandName").val());
+        if(brandName != ""){
+           /* if(!alphaNumericRegex.test(brandName)) {
+                $("#dummy-loader2").html("Not valid. Please input letters/numbers value only");
+            } else {*/
+                $("#dummy-loader2").html('<img src="/assets/img/ajax-loader.gif"> Validating, Checking if exists in Brand list first.');
+                
+                if(findMatchAgainst(brandName) != 1) {
+                    $.ajax({
+                        url: "/dcms/exclusion/existsearch", 
+                        type: "post", 
+                        cache: false,
+                        data: {post: brandName},
+                        success: function (data, textStatus, XMLHttpRequest) {
+
+                            if(data.substring(0,15).toString() == "<!DOCTYPE html>"){
+                                //<!DOCTYPE html>
+                                $("#dummy-loader2").html('<div style="color:red;">An error occurred or your session might have expired already. Click here to <a href="">login</a>.</div>');
+                            } else {
+                                var resultData = trimValue(data.toString());
+                                if(resultData != null && resultData != "") {
+                                    $("#dummy-loader2").html(data);
+                                } else {
+                                    $("#dummy-loader2").html("");
+                                    var findResult = findMatchAgainst(brandName);
+                                    if(findResult == 1) {
+                                        $("#dummy-loader2").html("<b>"+ brandName +"</b> is already in the selected list.");
+                                    } else {
+                                        var dest = document.getElementById("restriction_brand_selected");
+                                        var newOption = document.createElement("option");
+                                            newOption.text = brandName;
+                                            newOption.value = brandName;
+                                        try {
+                                            dest.add(newOption, null);
+                                        } catch(error) {
+                                            dest.add(newOption);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $("#dummy-loader2").html("An error occurred: " +  XMLHttpRequest.status + " Please try again.")
+                        },
+                        dataType: "html"
+                    });  
+                } else {
+                    $("#dummy-loader2").html("<b>"+ brandName +"</b> is already in the selected list.");
+                }
+            //}       
+        } else {
+            $("#dummy-loader2").html("");
+        }
+    }
+    
+    function letternumber(e, checkType)
+    {
+        var key;
+        var keychar;
+
+        if (window.event)
+            key = window.event.keyCode;
+        else if (e)
+            key = e.which;
+        else
+            return true;
+        keychar = String.fromCharCode(key);
+        keychar = keychar.toLowerCase();
+
+        // control keys
+        if ((key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27) || (key==32) ) {
+            return true;
+        }
+
+        if(checkType == 'number') {
+            if(key >= 48 && key <= 57){
+                return true;
+            }else{
+                return false;
+            }
+        } else if(checkType == 'letter') {
+            if ((key >= 65 && key <= 90) || (key >=97 && key <= 122)) {
+                return true;
+            }else {
+                return false;
+            }
+        } else {
+            if ((key >= 65 && key <= 90) || (key >=97 && key <= 122) || (key >= 48 && key <= 57)) {
+                return true;
+            }else {
+                return false;
+            }
+        }        
+    }    
+  
+    
+    function findMatchAgainst(value) {
+    
+        var matchString = value;
+        var brandSelected = getAllSelectedValues("#restriction_brand_selected");
+        var response = 0;
+        $.each(brandSelected, function(index, value) {
+            
+            var cmp1 = value.toLowerCase();
+            var cmp2 = matchString.toLowerCase();
+            if(cmp1 != cmp2) {
+            } else {
+                response = 1;
+            }
+        });
+        return response;
+    }
+
+    function populateSelected() {
+        
+        $("#restriction_brand_selected").find('option').each(function() {
+            $(this).attr('selected', 'selected');
+        });   
+    }
+
+</script>
+
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <div class="messages">
+            <?php echo $this->flashMessages(); ?>
+        </div> 
+        <form id="exclusionform_id" name="exclusionform" class="dataform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponTable">
+                    <tr>
+                        <td>
+                            Websites: 
+                            <select id="siteId" name="siteId" onchange="getExclusions();">
+                                <?php
+                                    if(is_array($this->readsites) && count($this->readsites) > 0) {
+                                        foreach($this->readsites as $key => $value) {
+                                            $optionpage1 = "<option value='{$value['siteId']}'";
+                                            ($this->siteId == $value['siteId']) ? $optionpage1 .= " selected='selected'" : "";
+                                            $optionpage1 .= ">{$value['name']}</option>";
+                                            echo $optionpage1;
+                                        }
+                                    }
+                                ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <?php
+                                if(is_string($this->readsites)) {
+                                    echo "An error occured while requesting on the API.";
+                                } else {
+                                    echo "&nbsp;";
+                                }
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Add brand that is not in the list:</b> <input type="text" id="brandName" style="width:150px;" class="uniform text" name="brandName" maxlength="50" <?php /*onKeypress="return letternumber(event);"*/ ?> /> <input type="button" value="Add Brand" id="brand_add" name="brand_add" class="uniform" onclick="addBrand();" /></td>
+                    </tr>
+                    <tr>
+                        <td><div id="dummy-loader2"></div></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+                <div style="clear:both;"></div>
+                    <div class="lists" style="width: 100%">
+                        <!-- BRAND TEMPLATE -->
+                        <div style="" id="brandtemplate" class="tab_contents">
+                            <div style="width: 100%">
+                                <div style="width: 100%">
+                                    <div style="float: left; width: 301px; margin-right: 6px; border: 1px solid #D5D5D5; ">
+                                        <div style="height: 30px; background-color: #25609D;">
+                                            <div style="float:left; font-weight: bold; text-align: left; color: #FFF; margin-top:5px; padding-left: 2px; width: 130px; margin-left:2px;">Brands</div>
+                                            <div style="float:left; margin-top: 5px; width: 120px;">
+                                                <input type="text" name="restriction_brand_selector_search" id="restriction_brand_selector_search" value="search brand" style="width: 150px; color:#999; font:inherit !important;" onFocus='clearTextBox("#restriction_brand_selector_search"); return false;' onKeyUp="searchBox('direct', this.value, '#restriction_brand_list', 'brandlist', 
+                            'RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE', 'RESTRICTION_BRAND_LIST_SEARCH', 
+                            'RESTRICTION_BRAND_LIST_OFFSET_SIZE', '#restriction_brand_list', '#restriction_brand_selected', event); return false;">
+                                            </div>
+                                            <div style="clear:both;"></div>
+                                        </div>
+                                        <div>
+                                            <?php //echo $this->form->getElement('restriction_brand_list');?>
+                                            
+<select name="restriction_brand_list[]" id="restriction_brand_list" multiple="multiple" style="width: 301px; height: 250px;" size="15" onChange="callList(this.value, this.id, 'brandlist', 'RESTRICTION_BRAND_LIST_OFFSET_SIZE', '#restriction_brand_selected'); return false;" onDblClick="listbox_moveacross('restriction_brand_list', 'restriction_brand_selected', 'restriction_brand_list', 'add');">
+    
+</select> 
+                                            
+                                        </div>
+                                    </div>
+                                    <div style="float: left; width: 301px; border: 1px solid #D5D5D5;">
+                                        <div style="height: 30px; background-color: #25609D;">
+                                            <div style="float:left; font-weight: bold; text-align: left; color: #FFF; margin-top:5px; padding-left: 2px; width: 130px; margin-left:2px;">Selected Brands</div>
+                                            <div style="clear:both;"></div>
+                                        </div>
+                                        <div>
+                                            <?php //echo $this->form->getElement('restriction_brand_selected'); ?>
+                                            
+                                            <select name="restriction_brand_selected[]" id="restriction_brand_selected" multiple="multiple" style="width: 301px; height: 250px;" size="15" onDblClick="listbox_moveacross('restriction_brand_selected', 'restriction_brand_list', 
+                                'restriction_brand_list', 'remove');
+                                listbox_selectall('restriction_brand_list',false); 
+                                sortSelect(this.form['restriction_brand_list'], true);">
+    
+</select> 
+                                            
+                                        </div>
+                                    </div>
+                                    <div style="clear:both;"></div>
+                                </div>
+                            </div>
+                        </div>                        
+                        <!-- END OF BRAND TEMPLATE -->
+                    </div>
+                <div style="clear:both;"></div>
+            </div>
+            <div class="bg_btn">
+                <div style="float: left !important">
+                            <div id="dummy-loader"></div>
+                        </div>
+                <input type="button" value="Save Exclusion" id="exclusion_save" onclick="populateSelected();document.getElementById('exclusionform_id').submit();" name="exclusion_save" class="uniform" />
+            </div>
+        </div>
+        </form>
+    </div>
+</div>

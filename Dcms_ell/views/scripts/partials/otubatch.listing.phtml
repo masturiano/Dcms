@@ -1,0 +1,55 @@
+<script>
+    $('#checkAllAuto').click(
+    function(){
+        $("INPUT[type='checkbox']").attr('checked', $('#checkAllAuto').is(':checked'));    
+    }
+)
+</script>
+<?php
+$view = Zend_Registry::get('view');
+$used = abs($this->initial - $this->remaining);
+$batchId = $this->batchId;
+$jobId = $this->jobId;
+$coupon = $this->coupon;
+$batchName = $coupon['name'];
+$exportAction = "";
+$exportUrl = $view->exportUrl;
+$editAction = "<a href='/dcms/coupon/updateotucoupon/name/{$batchName}'>edit</a>";
+if (isset($this->jobId)) {
+    $jobId = $this->jobId;
+    $exportAction = "<a href='/dcms/coupon/export/format/json/jobid/{$jobId}/batchname/{$batchName}/batchid/{$batchId}'>export</a>";
+}
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+$createdAt = $this->createdAt;
+echo '
+<tr style="background-color:' . $__row_style . ';">
+    <!--<td>
+        <div style="padding:5px; text-align:center;">
+            <input type="checkbox" id="batch_id[' . $batchId . ']" name="batch_id[' . $batchId . ']" value="' . $jobId . '" />
+        </div>
+    </td>-->
+    <td>
+        <div style="padding:5px;">' . $batchId . '</div>
+    </td>
+    <td>
+        <div style="padding:5px;"><a href="/dcms/coupon/updateotucoupon/name/' . $batchName . '">' . $batchName . '</a>
+        </div>
+    </td>
+    <td>
+        <div style="padding:5px;">' . date("m/d/Y h:i A", $createdAt['sec']) . '
+        </div>
+    </td>
+    <td>
+        <div style="padding:5px; text-align:center;">' . number_format((int) $this->initial, 0, '', ',') . '</div>
+    </td>
+    <td>
+        <div style="padding:5px; text-align:center;">' .number_format((int) $used, 0, '', ',')  . '</div>
+    </td>
+    <td>
+        <div style="padding:5px; text-align:center;">' . number_format((int) $this->remaining, 0, '', ',') . '</div>
+    </td>
+    <td>
+        <div style="padding:5px; text-align:center;">' . $editAction . ' | ' . $exportAction . '</div>
+    </td>
+</tr>';
+?>

@@ -1,0 +1,180 @@
+<?php
+$template = $this->template;
+$templateName = isset($template['templateName']) ? $template['templateName'] : "";
+$templateId = isset($template['templateId']) ? $template['templateId'] : "";
+$limit = $template['limit'];
+$skip = $template['skip'];
+?>
+
+<script>
+    var resultsContainer;
+    var limit = <?php echo $limit; ?>;
+    var templateName = "<?php echo $templateName; ?>";
+    var templateId = "<?php echo $templateId; ?>";
+    //var skip = <?php //echo $skip;          ?> + limit;
+    var li_text = "";
+    var li_prev_skip = "";
+    var li_prev_text = "";
+    var template_search_btn_clicked = false;
+    var inputValid = true;
+    
+    jQuery(document).ready(function() {
+        jQuery('#mycarousel').jcarousel();
+        firstPageFocus();
+    });
+   
+
+    function openTemplate(link, windowName) {
+        if(document.getElementById('applyrestriction_checkbox').checked){
+        
+            var params;
+            params = 'width='+screen.width;
+            params += ', height='+screen.height;
+            params += ', top=0, left=0';
+            params += ', fullscreen=yes, scrollbars=yes';
+            window.open(link, windowName, params);
+        }
+        return false;
+        
+    }
+    
+    
+    function setClicked(clicked){
+        template_search_btn_clicked = clicked;
+    }
+    
+    
+    function hasSpecialChar(input){
+        var iChars = "!@#$%^&*()+=-[]\\\';,./{}|\":<>?"; 
+        for (var i = 0; i < input.length; i++) {
+            if (iChars.indexOf(input.charAt(i)) != -1) {
+                return true;
+            }
+        }
+        return false;
+    }  
+    
+    
+    
+    function loadResults(skip){
+        resultsContainer = document.getElementById('restrictions_container');
+        var templateSearchElement = document.getElementById('templateSearch');
+        var templateSearch = templateSearchElement.value;
+        var restrictionsElement = document.getElementById("restrictions");
+
+        if(template_search_btn_clicked){
+//            if(hasSpecialChar(templateSearch)){
+//                inputValid = false;
+                templateSearchElement.value = "";
+//            } else{
+//                inputValid = true;
+//            }
+        }else{
+            inputValid = true;
+        }
+                        
+        if(inputValid){
+            removeError(restrictionsElement);
+            inputValid = true;
+            $.ajax({
+                url: "/dcms/template/options/format/html/templateName/"+encodeURIComponent(templateName.toString())+"/templateId/"+templateId+"/templateSearch/"+templateSearch+"/skip/"+skip+"/limit/"+limit+"?s="+Math.random(),
+                type: "GET",
+                success: function(response){
+                    if(response.substring(0,15).toString() == "<!DOCTYPE html>"){
+                        //<!DOCTYPE html>
+                        $("#error_restrictions").html('<div style="color:red;">An error occurred or your session might have expired already. Click here to <a href="">login</a>.</div>');
+                    } else {
+                        if(response != ""){
+                            $("#restrictions_list").html(response);
+                            if($('select#restrictions option').length == 0){
+                                showError(restrictionsElement, "Template not found.");
+                                document.getElementById('viewTemplate').style.display = 'none';
+                            }else{
+                                removeError(restrictionsElement);
+                                var templateCount = $("#templateCount").val();
+                                if(template_search_btn_clicked){
+                                    template_search_btn_clicked = false;
+                                
+                                    $.ajax({
+                                        url: "/dcms/template/pages/format/html/count/"+templateCount+"/skip/"+skip+"/limit/"+limit+"?s="+Math.random(),
+                                        type: "GET",
+                                        success: function(data){
+                                            if(data.substring(0,15).toString() == "<!DOCTYPE html>"){
+                                                //<!DOCTYPE html>
+                                                $("#error_restrictions").html('<div style="color:red;">An error occurred or your session might have expired already. Click here to <a href="">login</a>.</div>');
+                                            } else {
+                                                $( "#viewTemplate" ).html( data );
+                                                jQuery('#mycarousel').jcarousel();
+                                                firstPageFocus();
+                                            }
+                                        },
+                                        error: function(err){
+                                            resultsContainer.innerHTML += err;
+                                        }
+                                    });
+
+                                }
+
+                                li_text = $("#page"+skip+ " a").text();
+                                $("#page"+skip+ " a").remove();
+                                $("#page"+skip).html(li_text);
+                                document.getElementById('viewTemplate').style.display = 'block';
+
+                                $('#templateSearch').val(templateSearch);
+                            
+
+
+                                if(li_prev_skip != null && li_prev_skip != skip && li_prev_text != ""){
+                                    $("#page"+li_prev_skip).html("<a onclick='loadResults("+li_prev_skip+")' style='cursor:pointer'>"+li_prev_text+"</a>");
+                                }
+                                li_prev_skip =  skip;
+                                li_prev_text = li_text;
+                            }
+                                
+                            
+                            
+                            
+                            disableRestriction(false);
+                       
+                        }else{
+
+                        }
+                    }
+                },
+                error: function(err){
+                    resultsContainer.innerHTML += err;
+                }
+            });
+        
+        }else{
+            //input invalid
+            showError(restrictionsElement, errorHandler.SPECIAL_CHARS_NOT_ALLOWED);
+        }
+
+    }
+    
+    
+    function firstPageFocus(){
+        li_text = $("#page0 a").text();
+        li_prev_skip = 0;
+        li_prev_text = li_text;
+        $("#page0 a").remove();
+        $("#page0").html(li_text);
+    }
+    
+    
+	
+</script>
+<center>
+    <div id="restrictions_container">
+        <div id="restrictions_list">
+            <?php echo $this->partial('template/options.ajax.phtml', $template); ?>
+        </div>
+        <div id="viewTemplate" style="display:none;">
+            <?php echo $this->partial('template/pages.ajax.phtml', $template); ?>
+        </div>
+
+    </div>
+    <div class="error restrictions"> </div>
+    <div id="error_restrictions"></div>
+</center>

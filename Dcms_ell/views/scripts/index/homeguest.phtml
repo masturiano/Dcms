@@ -1,0 +1,138 @@
+<script>
+    function popView(link, windowName) {
+    
+        var params;
+        params = 'width='+screen.width;
+        params += ', height='+screen.height;
+        params += ', top=0, left=0';
+        params += ', fullscreen=yes, scrollbars=yes';
+    
+        window.open(link.href, windowName, params);
+        return false;
+    }
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.guest.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <div class="messages"> 
+            <?php echo $this->flashMessages(); ?> 
+        </div> 
+        <div id="main">
+            <?php
+            $coupon_site = $this->form->getElement('coupon_domains');
+            $expiration_type = $this->form->getElement('expiration_type');
+            $counPerPage = $this->form->getElement('countperpage');
+            ?>
+            <div class="coupons-navi">
+                <form name="home" enctype="application/x-www-form-urlencoded" method="post">
+                    <table border="0">
+                        <tbody>
+                            <tr>
+                                <td width="10%"><b>Site:</b></td>
+                                <td width="20%">
+                                    <span style="font-size: 12px; font-weight: 500;">
+                                        <?php
+                                        isset($this->query['coupon.domains']) ? $coupon_site->setValue($this->query['coupon.domains']) : "";
+                                        echo $coupon_site;
+                                        ?>
+                                    </span>
+                                </td>
+
+                                <td width="60%">
+                                    <table width="100%" border="0">
+                                        <tbody><tr>
+                                                <td width="5%">&nbsp;</td>
+                                                <td width="15%"><b>Coupon Type:</b></td>
+                                                <td width="20%"><span style="font-size: 12px; font-weight: 500;">
+                                                        <?php
+                                                        isset($this->query['expiration.type']) ? $expiration_type->setValue($this->query['expiration.type']) : "";
+                                                        echo $expiration_type;
+                                                        ?>	
+                                                    </span></td>
+                                            </tr>
+                                        </tbody></table>
+                                </td>
+                                <td width="5%"></td>
+                                <td width="5%"><span style="color: black; font-size: 10px; font-weight: 700;"></span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5"><?php
+                                                        isset($this->countperpage) ? $counPerPage->setValue($this->countperpage) : "";
+                                                        $counPerPage->setDecorators(array('ViewHelper'));
+                                                        echo $counPerPage->getLabel();
+                                                        ?>
+<?php echo $counPerPage; ?></td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </form>
+                <div style="color: blue; font-size: 14px; font-weight: 400;"></div>
+                <div class="results-no"><!-- 1-10 results out of 1,837 --></div>    
+            </div>
+            <br>
+            <div id="search"></div>
+        </div>
+        <div>
+<?php $pagevars = $this->paginator->getPages(); ?>
+            <div class="pagination">
+                <div class="page-info">
+<?php echo $pagevars->totalItemCount; ?>
+                </div>
+
+                <?php
+                echo $this->paginationControl($this->paginator, 'Sliding', '/partials/paginationcontrols.phtml', array('request' => $this->request));
+                ?>
+            </div>
+            <?php $this->sort = ($this->sort == "1") ? "-1": "1"; ?>
+            <table  class="datatable" width="100%">
+                <thead>
+                    <tr style="text-align: left;">
+                        <th width="2%">&nbsp;</th>
+                        <th width="20%">
+                            <a href="<?php echo $this->url(array_merge($this->request, array('sortby' => "coupon.name", 'sort' => $this->sort)), 'default'); ?>">
+                                Coupon Name
+                            </a>
+                        </th>
+                        <th  width="10%">
+                            <a href="<?php echo $this->url(array_merge($this->request, array('sortby' => "createdAt", 'sort' => $this->sort)), 'default'); ?>">
+                                Date Created</th>
+                        </a>
+                        <th  width="10%">Template</th>
+                        <th  width="5%">
+                            <a href="<?php echo $this->url(array_merge($this->request, array('sortby' => "coupon.domains", 'sort' => $this->sort)), 'default'); ?>">
+                                Site
+                            </a>
+                        </th>
+                        <th  width="20%">Time Frame</th>
+                        <th  width="5%">
+                            <a href="<?php echo $this->url(array_merge($this->request, array('sortby' => "coupon.owner", 'sort' => $this->sort)), 'default'); ?>">
+                                Owner
+                            </a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (count($this->paginator)) {
+                        echo $this->partialLoop('partials/couponguest.listing.phtml', $this->paginator);
+                    }
+                    ?>
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+            <div class="pagination">
+                <div class="page-info">
+<?php echo $pagevars->totalItemCount; ?>
+                </div>
+
+                <?php
+                echo $this->paginationControl($this->paginator, 'Sliding', '/partials/paginationcontrols.phtml', array('request' => $this->request));
+                ?>
+            </div>
+
+        </div>
+    </div>
+</div>

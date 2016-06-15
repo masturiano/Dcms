@@ -1,0 +1,62 @@
+<?php 
+$killswitch = $this->killswitch; 
+$_p = $this->pagename;
+?>
+<div class="l1bar">
+    <div class="l1nav">
+        <ul>
+            
+           <?php 
+           if(in_array("dcms.admin", $this->user->getRoles()) || in_array("dcms.super", $this->user->getRoles())){
+  
+            ?>
+            <li<?php if($_p == "dcms.index.index" || $_p == "dcms.index.home") { echo ' class="active"';}?>>
+                 <a href="/dcms/index/index">Home</a>
+             </li>
+            <li<?php if($_p == "dcms.template.list" || $_p == "dcms.template.add" || $_p == "dcms.template.addUpload" || $_p == "dcms.template.edit") { echo ' class="active"';}?>>
+                <a href="/dcms/template/index">Template</a>
+            </li>
+            <li<?php if($_p == "dcms.coupon.index" || $_p == "dcms.coupon.add" || $_p == "dcms.coupon.edit") { echo ' class="active"';}?>>
+                <a href="/dcms/coupon/index">Coupon</a>
+            </li>
+            <li<?php if($_p == "dcms.coupon.production") { echo ' class="active"';}?>>
+                <a href="/dcms/coupon/production">Production</a>
+            </li>
+            <?php
+            if(isset($killswitch['onetimeuse']) && !$killswitch['onetimeuse']) :
+                if($_p == "dcms.coupon.addotucoupon" || $_p == "dcms.coupon.updateotucoupon" ) :
+                ?>
+            <li<?php if($_p == "dcms.coupon.addotucoupon" || $_p == "dcms.coupon.updateotucoupon" ) { echo ' class="active"';}?>>
+                <a href="/dcms/coupon/otucoupon">OTU Coupon</a>
+            </li>
+            <?php endif; ?>
+            <li<?php if($_p == "dcms.coupon.otubatchlist" ) { echo ' class="active"';}?>>
+                <a href="/dcms/coupon/otubatchlist">OTU Batch List</a>
+            </li>
+            <li<?php if($_p == "dcms.coupon.dispensebatchlist" ) { echo ' class="active"';}?>>
+                <a href="/dcms/coupon/dispensebatchlist">Dispense Batch List</a>
+            </li>
+            <?php
+            endif;
+            ?>
+            <li<?php if($_p == "dcms.exclusion.list" ) { echo ' class="active"';}?>>
+                <a href="/dcms/exclusion/list">Manage Exclusion</a>
+            </li>
+            <li<?php if($_p == "dcms.couponowners.index" || $_p == "dcms.couponowners.addowner" || $_p == "dcms.couponowners.updateowner") { echo ' class="active"';}?>>
+                <a href="/dcms/couponowners/index">Owners</a>
+            </li>
+            <?php
+           }
+            if(in_array("dcms.otucoupon.manage", $this->user->permissions))
+            {
+            ?>
+            <li<?php if($_p == "dcms.otucoupon.manage") { echo ' class="active"';}?>>
+                <a href="/dcms/otucoupon/manage">Manage OTU</a>
+            </li>
+            <?php
+            }
+            ?>
+        </ul>
+    </div>
+</div>
+<div class="clear"></div>

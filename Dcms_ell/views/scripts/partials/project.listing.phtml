@@ -1,0 +1,16 @@
+<?php $view = Zend_Registry::get('view');?>
+<?php $__row_style = (($this->partialCounter % 2 )? "dark" : "light"); ?>
+
+<tr class="<?php echo $__row_style;?>">
+      <td> <?php if($this->projstatus == 'active')
+                    {echo '<a href="/spinner/data/setproject/project/' .  Utility::keyNormalize($this->project) . '">'. $this->project . '</a>';}
+                else
+                    {echo $this->project; }?></td>
+      <td><?php echo $this->description;?></td>
+      <td><?php if($this->projstatus == 'active')
+                    {echo '<a href="/spinner/data/setproject/project/' .  Utility::keyNormalize($this->project) . '">Active</a>';}
+                else
+                    {echo "Archived"; }?></td>
+   <td ><a href="/spinner/projects/delete/id/<?php echo $this->id . $view->additionalurl; ?>" onclick="return confirm('Are you sure you want to delete this project');"><img src="/assets/img/delete.png" title="Delete this project"/></a>
+                    <a href="/spinner/projects/edit/id/<?php echo $this->id . $view->additionalurl;?>" onclick="return confirm('Are you sure you want to edit this project');"><img src="/assets/img/edit.png" title="Edit this project"/></a></td>
+</tr>

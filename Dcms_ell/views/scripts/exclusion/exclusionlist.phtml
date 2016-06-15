@@ -1,0 +1,23 @@
+<?php
+$result = $this->readcurrentsite;
+
+if(is_string($result)) :
+    echo "An error occured while requesting on API.";
+else :
+    if(isset($result[0])) :
+?>
+    <script>
+        <?php
+            foreach($result[0]['brands'] as $key => $brand) :
+                $data = "<option value='" . addslashes($brand) . "'>" . addslashes($brand) . "</option>";                            
+        ?>
+                $("#restriction_brand_selected").append("<?php echo $data; ?>");
+        <?php
+            endforeach;
+        ?>
+    </script>  
+<?php
+    endif;
+endif;
+
+?>

@@ -1,0 +1,812 @@
+<style>
+    .bg_btn {
+        background-color: #F6F6F6;
+        border-bottom: 5px solid #555555;
+        border-top: 5px solid #555555;
+        margin-top: 20px;
+        padding: 8px 10px;
+        text-align: right;
+    }
+    /* TAB MENU START */
+    ul.tabs
+    {
+        padding: 7px 0;
+        font-size: 0;
+        margin:0;
+        list-style-type: none;
+        text-align: left; /*set to left, center, or right to align the tabs as desired*/
+        position: relative;
+        left: -79px;
+        top: -125px;
+    }
+            
+    ul.tabs li
+    {
+        display: inline;
+        margin: 0;
+        margin-right:3px; /*distance between tabs*/
+    }
+            
+    ul.tabs li a
+    {
+        font: normal 10px Verdana;
+        text-decoration: none;
+        position: relative;
+        padding: 7px 16px;
+        border: 1px solid #CCC;
+        border-bottom-color:#B7B7B7;
+        color: #000;
+        background: #F0F0F0 url(tabbg.gif) 0 0 repeat-x;
+        border-radius: 3px 3px 0 0;
+        outline:none;
+    }
+            
+    ul.tabs li a:visited
+    {
+        color: #000;
+    }
+
+    ul.tabs li#active_page a:visited
+    {
+        position: relative;
+        top: 0px;
+        font-weight:bold;
+        /* background: white; */
+        border: 1px solid #B7B7B7;
+        border-bottom-color: white;
+        background-color: #00A5BD;
+    }
+            
+    ul.tabs li a:hover
+    {
+        border: 1px solid #B7B7B7;
+        /* background:#F0F0F0 url(tabbg.gif) 0 -36px repeat-x; */
+        background-color: #00A5BD;
+    }
+            
+    ul.tabs li.selected a, ul.tabs li.selected a:hover
+    {
+        position: relative;
+        top: 0px;
+        font-weight:bold;
+        /* background: white; */
+        border: 1px solid #B7B7B7;
+        border-bottom-color: white;
+        background-color: #00A5BD;
+    }
+            
+            
+    ul.tabs li.selected a:hover
+    {
+        text-decoration: none;
+    }
+         
+
+    div.tabcontents
+    {
+        border: 1px solid #B7B7B7; padding: 3px;
+        background-color:#00A5BD;
+        border-radius: 0 3px 3px 3px;
+        width: 650px;
+        position: relative;
+        left: -79px;
+        top: -125px;
+    }   
+    /* TAB MENU END */
+</style>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab" style="height: 700px;">
+        <!-- INNER TAB START -->
+        <div style="width: 500px; margin: 0 auto; padding: 120px 0 40px;">
+            <!-- TAB MENU START -->
+            <ul class="tabs" data-persist="true">
+                <li><a href="/dcms/template/add" onclick="clearTemplateName();">By List</a></li>
+                <li id="active_page" class="active"><a href="/dcms/template/addupload" onclick="clearTemplateName();">By Upload</a></li>
+            </ul>
+            <!-- TAB MENU END -->
+            <!-- TAB CONTENT START -->
+            <div class="tabcontents">
+                <!-- CONTENT START -->
+                <div id="main">
+                    <div class="messages">
+                        <?php echo $this->flashMessages(); ?>
+                    </div>
+                    <?php if(isset($this->form)) : 
+                        ?>
+                    <form action="<?php echo $this->form->getAction(); ?>"
+                          enctype="<?php echo $this->form->getEnctype(); ?>"
+                          method="<?php echo $this->form->getMethod(); ?>"
+                          id="<?php echo $this->form->getId(); ?>"
+                          name="<?php echo $this->form->getName(); ?>"
+                          class="<?php echo $this->form->getAttrib('class'); ?>"
+                    >
+                        
+                        <div id="include-exclude">
+                            <div style="padding-bottom: 20px;" class="contollermessage">Template Name: 
+                                <?php echo $this->form->getElement('template_name'); ?>&nbsp;
+                                <?php echo $this->form->getElement('exinradio');?>
+                                <br>
+                                <br>
+                                <?php echo $this->form->getElement('restriction_selector_select'); ?>
+                                <br>
+                                <br>
+                                <?php echo $this->form->getElement('attachment'); ?>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="bg_btn">
+                                <div style="float: left !important">
+                                    <div id="dummy-loader"></div>
+                                </div>
+                                <input type="button" value="Save" name="save_template" onclick="document.getElementById('Dcms_Template_Addeditupload').submit();" class="uniform" />
+                                <input type="button" value="Cancel" name="cancel_template" onclick="location.href='/dcms/template'" class="uniform" />
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        <div style="clear: both;"></div>
+                    </form>
+                    <?php endif; ?>
+                    <?php if(isset($this->success)) {
+                            echo $this->success;
+                        } 
+                    ?>
+                </div>    
+                <!-- CONTENT2 END -->                
+            </div>
+            <!-- TAB CONTENT END -->
+        </div>
+        <!-- INNER TAB END -->
+    </div>
+
+</div>
+<!--<div id="dummy-loader"></div>-->
+<script type="text/javascript" src="/assets/js/jquery/functions.js"></script>
+<script type="text/javascript">
+    
+    var searchKeyword = "search";
+    var beforeSearch = "";
+    var pagesize = 30;
+    var offsetPage = 0;
+    
+    var offsetHash = {};
+    offsetHash.RESTRICTION_PART_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_PART_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_PART_BRAND_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_PART_BRAND_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_PART_PART_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_BRAND_PART_PART_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_PART_BRAND_PART_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_PART_BRAND_PART_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_PART_BRAND_BRAND_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_PART_BRAND_BRAND_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_BRAND_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_BRAND_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_SKU_JCW_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_SKU_JCW_LIST_SEARCH_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_SKU_STT_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_SKU_STT_LIST_SEARCH_OFFSET_SIZE = 0;    
+    offsetHash.RESTRICTION_SKU_SKU_USAP_LIST_OFFSET_SIZE = 0;
+    offsetHash.RESTRICTION_SKU_SKU_USAP_LIST_SEARCH_OFFSET_SIZE = 0;      
+    
+    var searchHash = {};
+    searchHash.RESTRICTION_PART_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_BRAND_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_BRAND_PART_BRAND_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_BRAND_PART_PART_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_PART_BRAND_PART_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_PART_BRAND_BRAND_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_SKU_BRAND_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_SKU_SKU_JCW_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_SKU_SKU_STT_LIST_SEARCH = "search";
+    searchHash.RESTRICTION_SKU_SKU_USAP_LIST_SEARCH = "search";
+
+    $(document).ready(function() {
+        selectorDisplayType($("#restriction_selector_select").val(),"#restriction_selector_select");
+    });
+    
+    function getObjectElementValue(object, objElement) {
+
+        if(object.hasOwnProperty(objElement)) {
+            return {elm:objElement, elvalue:object[objElement]};
+        } else {
+            return false;
+        }
+    }
+    
+    function selectorDisplayType(value, element) {
+        
+        var selectedValue = trimValue(value);
+        $(element + ' option').each(function(index) {
+           if($(this).val() == selectedValue) {
+               $("#"+$(this).val()).show();
+           } else {
+               $("#"+$(this).val()).hide();
+           }
+        });
+        
+        var elementToPopulate = getSelectorValue(selectedValue);
+        populateList(elementToPopulate);
+    }
+    
+    function getSelectorValue(value) {
+
+        switch (value) {
+            case "parttemplate" :
+                return {
+                    elementId:"#restriction_part_list", 
+                    elementOffsetSize:"RESTRICTION_PART_LIST_OFFSET_SIZE", 
+                    method:"partlist",
+                    selectedData: getAllSelectedValues("#restriction_part_selected")
+                };
+                break;
+            case "brandtemplate" :
+                return {
+                    elementId:"#restriction_brand_list", 
+                    elementOffsetSize:"RESTRICTION_BRAND_LIST_OFFSET_SIZE", 
+                    method:"brandlist",
+                    selectedData: getAllSelectedValues("#restriction_brand_selected")
+                };
+                break;
+            case "brandparttemplate" :
+                return {
+                    elementId:"#restriction_brand_part_brand_list", 
+                    elementOffsetSize:"RESTRICTION_BRAND_PART_BRAND_LIST_OFFSET_SIZE",
+                    method:"brandlist"
+                };
+                break;
+            case "partbrandtemplate" :
+                return {
+                    elementId:"#restriction_part_brand_part_list", 
+                    elementOffsetSize:"RESTRICTION_PART_BRAND_PART_LIST_OFFSET_SIZE",
+                    method:"partlist"
+                };
+                break;
+            case "skutemplate" :
+                return {
+                    elementId:"#restriction_sku_brand_list", 
+                    elementOffsetSize:"RESTRICTION_SKU_BRAND_LIST_OFFSET_SIZE",
+                    method:"brandlist"
+                };
+                break;
+            default :
+                return {
+                    elementId:"#restriction_part_list", 
+                    elementOffsetSize:"RESTRICTION_PART_LIST_OFFSET_SIZE",
+                    method:"partlist"
+                };
+                break;
+        }
+    }
+    
+    function populateList(elementToPopulate) {
+        
+        var size = getSelectOptionSize(elementToPopulate.elementId);
+        
+        if(size <= 0) {    
+            var objElement = getObjectElementValue(offsetHash, elementToPopulate.elementOffsetSize);
+
+            offsetHash[objElement.elm] = 0;
+            offsetPage = offsetHash[objElement.elm];
+            if(objElement != false) {
+                loadElement("#dummy-loader", 
+                    "/dcms/template/" + elementToPopulate.method, 
+                    "post", 
+                    (elementToPopulate.hasOwnProperty('selectedData')) ?
+                        {offset:offsetPage,pagesize:pagesize, element:elementToPopulate.elementId, selected:elementToPopulate.selectedData} :
+                        {offset:offsetPage,pagesize:pagesize, element:elementToPopulate.elementId} ,
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    elementToPopulate.elementId
+                );
+                offsetHash[objElement.elm] = objElement.elvalue + pagesize;
+            }
+        }
+    }
+
+    function searchBox(searchType, value, element, method, offsetSearchType, searchKeywordList, offsetList, dynamicElement, selectedDataElement, evt, parentSecondDegLvl, secondLvlOffsetKey) {
+    
+        if(typeof(evt) != 'undefined' && evt !== null){
+            var charCode;
+            
+            if(evt == 13 || evt == "13") {
+                charCode = 13;
+            } else {
+                evt = (evt) ? evt : event;
+                charCode = (evt.charCode) ? evt.charCode : ((evt.keyCode) ? evt.keyCode : ((evt.which) ? evt.which : 0));
+//                if(charCode != 32 && charCode != 8 && charCode != 46 && (charCode < 48 || charCode > 90) && (charCode < 96 || charCode > 105)) {
+//                    return false;
+//                }
+            }
+            if(charCode != 13) {
+                return false;
+            }
+        }      
+        
+        if(typeof(parentSecondDegLvl) != 'undefined' && parentSecondDegLvl !== null){
+            try {
+                var parent = document.getElementById(parentSecondDegLvl);
+                var parentpost = parent.options[parent.selectedIndex].value;
+            } catch (error) {
+                alert("Second degree level of searching. Please select on the first list.");
+                return false;
+            }
+        }
+        
+        var objElementSearchHash = getObjectElementValue(searchHash, searchKeywordList);
+        searchHash[objElementSearchHash.elm] = searchKeyword;//beforeSearch
+        
+        var objElementOffsetHash = getObjectElementValue(offsetHash, offsetSearchType);
+        var objElementListOffsetHash = getObjectElementValue(offsetHash, offsetList)
+       
+        if(searchHash[objElementSearchHash.elm] != value) {//beforeSearch
+            offsetHash[objElementOffsetHash.elm] = 0;
+            offsetPage = 0;
+            offsetHash[objElementListOffsetHash.elm] = 0;
+            searchKeyword = value;
+        } else {
+            if(searchType == 'direct') {
+                
+                offsetHash[objElementOffsetHash.elm] = 0;
+                offsetPage = offsetHash[objElementOffsetHash.elm];
+            } else {
+                offsetHash[objElementOffsetHash.elm] = objElementOffsetHash.elvalue + pagesize;
+                offsetPage = offsetHash[objElementOffsetHash.elm];                                                
+            }
+        }
+        /////FIXED ARRAY PUSH ////////
+        var loadParam = [];
+        if(typeof(parentSecondDegLvl) != 'undefined' && parentSecondDegLvl !== null){ 
+            if(secondLvlOffsetKey == 'usap') {
+                loadParam = {post:searchKeyword, offset:{usap:offsetPage}, pagesize:pagesize, search:true, element:{usap:dynamicElement}, selected:getAllSelectedValues(selectedDataElement), parentpost:parentpost};
+            } else if(secondLvlOffsetKey == 'jcw') {
+                loadParam = {post:searchKeyword, offset:{jcw:offsetPage}, pagesize:pagesize, search:true, element:{jcw:dynamicElement}, selected:getAllSelectedValues(selectedDataElement), parentpost:parentpost};
+            } else if(secondLvlOffsetKey == 'stt') {
+                loadParam = {post:searchKeyword, offset:{stt:offsetPage}, pagesize:pagesize, search:true, element:{stt:dynamicElement}, selected:getAllSelectedValues(selectedDataElement), parentpost:parentpost};
+            } else {
+                loadParam = {post:searchKeyword, offset:offsetPage, pagesize:pagesize, search:true, element:dynamicElement, selected:getAllSelectedValues(selectedDataElement), parentpost:parentpost};
+            }
+        } else {
+            loadParam = {post:searchKeyword, offset:offsetPage, pagesize:pagesize, search:true, element:dynamicElement, selected:getAllSelectedValues(selectedDataElement)};
+        }
+        loadElement(
+            element,
+            "/dcms/template/" + method, 
+            "post", 
+            loadParam, 
+            null, 
+            MESSAGE_LOADING, 
+            'html',
+            dynamicElement
+        );
+    }
+    
+    /**
+     * @param string    value
+     * @param string    elementId
+     * @param string    method
+     * @param string    offsetType
+     * @param boolean   loadNewList
+     * @param string    newListElementId
+     */
+    function callList(value, element, method, offsetType, selectedDataElement, loadNewList, newListElementId, newListElementIdOffsetType, newListElementIdMethod, newElementSearchText, newElementSearchOffset, newElementSearchId) {
+
+        if(value == 'append') {
+            var objElement = getObjectElementValue(offsetHash, offsetType);
+            if(objElement != false) {
+                 $("#" + element +' option:selected').remove();
+                 loadElement("#dummy-loader", 
+                    "/dcms/template/" + method, 
+                    "post", 
+                    {offset:objElement.elvalue,pagesize:pagesize, element:"#" + element, selected:getAllSelectedValues(selectedDataElement)}, 
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    "#" + element
+                );
+                offsetHash[objElement.elm] = objElement.elvalue + pagesize;
+            }
+        } else if(value == 'append-search-part-list'){
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_part_selector_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_PART_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_PART_LIST_SEARCH', 
+                'RESTRICTION_PART_LIST_OFFSET_SIZE',
+                "#" + element,
+                '#restriction_part_selected'
+            );
+        } else if(value == 'append-search-brand-list'){
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_brand_selector_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_BRAND_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_BRAND_LIST_SEARCH', 
+                'RESTRICTION_BRAND_LIST_OFFSET_SIZE',
+                "#" + element
+            ); 
+        } else if(value == 'append-search-brand-brand-list'){
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_brand_part_selector_brand_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_BRAND_PART_BRAND_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_BRAND_PART_BRAND_LIST_SEARCH', 
+                'RESTRICTION_BRAND_PART_BRAND_LIST_OFFSET_SIZE',
+                "#" + element,
+                '#restriction_brand_part_selected'
+            ); 
+        } else if(value == 'append-search-part-part-list'){
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_part_brand_selector_part_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_PART_BRAND_PART_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_PART_BRAND_PART_LIST_SEARCH', 
+                'RESTRICTION_PART_BRAND_PART_LIST_OFFSET_SIZE',
+                "#" + element,
+                '#restriction_part_brand_selected'
+            ); 
+        } else {            
+            if(loadNewList) {
+                var objElementSearchOffset = getObjectElementValue(offsetHash, newElementSearchOffset);
+                offsetHash[objElementSearchOffset.elm] = 0;
+                var objElementSearchHash = getObjectElementValue(searchHash, newElementSearchText);
+                searchHash[objElementSearchHash.elm] = "search";
+                var objElement = getObjectElementValue(offsetHash, newListElementIdOffsetType);
+                offsetHash[objElement.elm] = 0;
+                if(objElement != false) {
+                    $(newListElementId).empty();
+                    loadElement("#dummy-loader", 
+                        "/dcms/template/" + newListElementIdMethod, 
+                        "post", 
+                        {offset:offsetHash[objElement.elm],pagesize:pagesize, element:newListElementId, post:value, selected:getAllSelectedValues(selectedDataElement)}, 
+                        null, 
+                        MESSAGE_LOADING, 
+                        'html',
+                        "#" + element
+                    );
+                    offsetHash[objElement.elm] = pagesize;
+                }
+                $(newElementSearchId).val('');
+            }else {
+                return false;
+            }
+        }
+    }
+    
+    function secondLevelCheck(listType, value) {
+        
+        var trimListType = trimValue(listType);
+        var trimValueSelected = trimValue(value);
+        if(trimValueSelected == 'append' || trimValueSelected == 'zero-result') {
+            return false;
+        } else {
+            if(trimListType == 'partlist') {
+                
+                listbox_moveacross(
+                    'restriction_brand_part_part_list', 
+                    'restriction_brand_part_selected', 
+                    'restriction_brand_part_brand_list', 
+                    'add'
+                );
+                
+            } else if(trimListType == 'brandlist') {
+              
+                listbox_moveacross(
+                    'restriction_part_brand_brand_list', 
+                    'restriction_part_brand_selected', 
+                    'restriction_part_brand_part_list', 
+                    'add'
+                );
+            } else if(trimListType == 'usap' || trimListType == 'jcw' || trimListType == 'stt') {
+                
+                sku_listbox_moveacross(
+                    'restriction_sku_sku_' + trimListType +'_list', 
+                    'restriction_sku_selected', 
+                    'restriction_sku_brand_list', 
+                    'add',
+                    trimListType
+                );
+            }
+        }
+    }   
+    
+    function getAllSelection() {
+        
+        var selectedPartValues = getAllSelectedValues("#restriction_part_selected");
+        var selectedBrandValues = getAllSelectedValues("#restriction_brand_selected");
+        var selectedBrandPartValues = getAllSelectedValues("#restriction_brand_part_selected");
+        var selectedPartBrandValues = getAllSelectedValues("#restriction_part_brand_selected");
+        var selectedSkuValues = getAllSelectedValues("#restriction_sku_selected");
+        
+        return {
+            selectedPartValues:selectedPartValues, 
+            selectedBrandValues:selectedBrandValues, 
+            selectedBrandPartValues:selectedBrandPartValues, 
+            selectedPartBrandValues:selectedPartBrandValues, 
+            selectedSkuValues:selectedSkuValues
+        }
+    }
+    
+    function brandPartCallList(value, element, method, offsetType, firstListElement, selectedListElement) {
+        
+        try {
+            var parent = document.getElementById(firstListElement);
+            var post = parent.options[parent.selectedIndex].value;
+        } catch (error) {
+            alert("No selected option in the first select list.");
+            return false;
+        }
+        
+        if(value == 'append') {          
+            var objElement = getObjectElementValue(offsetHash, offsetType);
+            
+            if(objElement != false) {
+                $("#" + element +' option:selected').remove();
+
+                var loadParam = {post:post, offset:objElement.elvalue,pagesize:pagesize, element:"#" + element, selected:getAllSelectedValues(selectedListElement)};
+                             
+                loadElement("#dummy-loader", 
+                    "/dcms/template/" + method, 
+                    "post", 
+                    loadParam, 
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    "#"+element
+                );
+                offsetHash[objElement.elm] = objElement.elvalue + pagesize;
+            }
+        } else if(value == 'append-search-brandpart-list') {
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_brand_part_selector_part_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_BRAND_PART_PART_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_BRAND_PART_PART_LIST_SEARCH', 
+                'RESTRICTION_BRAND_PART_PART_LIST_OFFSET_SIZE',
+                "#" + element,
+                '#restriction_brand_part_selected',
+                13,
+                'restriction_brand_part_brand_list'
+            );    
+        }  else if(value == 'append-search-partbrand-list'){
+            $("#" + element +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_part_brand_selector_brand_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_PART_BRAND_BRAND_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_PART_BRAND_BRAND_LIST_SEARCH', 
+                'RESTRICTION_PART_BRAND_BRAND_LIST_OFFSET_SIZE',
+                "#" + element,
+                '#restriction_part_brand_selected',
+                13,
+                'restriction_part_brand_part_list'
+            ); 
+        } else {
+            return false;
+        }
+        
+    }
+    
+    function skuCallList(value, element, method, offsetType, offsetSiteType) {
+        
+        try {
+            var parent = document.getElementById('restriction_sku_brand_list');
+            var post = parent.options[parent.selectedIndex].value;
+        } catch (error) {
+            alert("No brand is selected.");
+            return false;
+        }
+
+        if(value == 'append') {          
+            var objElement = getObjectElementValue(offsetHash, offsetType);
+            
+            if(objElement != false) {
+                $("#" + element +' option:selected').remove();
+                
+                if(offsetSiteType == 'usap') {
+                    var loadParam = {post:post, offset:{usap: objElement.elvalue},pagesize:pagesize, element:{usap: "#" + element}, selected:getAllSelectedValues('#restriction_sku_selected')};
+                }
+                if(offsetSiteType == 'jcw') {
+                    var loadParam = {post:post, offset:{jcw: objElement.elvalue},pagesize:pagesize, element:{jcw: "#" + element}, selected:getAllSelectedValues('#restriction_sku_selected')};
+                }
+                if(offsetSiteType == 'stt') {
+                    var loadParam = {post:post, offset:{stt: objElement.elvalue},pagesize:pagesize, element:{stt: "#" + element}, selected:getAllSelectedValues('#restriction_sku_selected')};
+                }                 
+                loadElement("#dummy-loader", 
+                    "/dcms/template/" + method, 
+                    "post", 
+                    loadParam, 
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    "#"+element
+                );
+                offsetHash[objElement.elm] = objElement.elvalue + pagesize;
+            }
+        } else if(value == 'append-search-sku-usap-list') {
+            $("#" + element +' option:selected').remove();           
+            searchBox(
+                'indirect',
+                $('#restriction_sku_selector_sku_usap_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_SKU_SKU_USAP_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_SKU_SKU_USAP_LIST_SEARCH', 
+                'RESTRICTION_SKU_SKU_USAP_LIST_OFFSET_SIZE',
+                '#restriction_sku_sku_usap_list',
+                '#restriction_sku_selected',
+                13,
+                'restriction_sku_brand_list',
+                'usap'
+            );
+        } else if(value == 'append-search-sku-jcw-list') {
+            $("#" + element +' option:selected').remove();           
+            searchBox(
+                'indirect',
+                $('#restriction_sku_selector_sku_jcw_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_SKU_SKU_JCW_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_SKU_SKU_JCW_LIST_SEARCH', 
+                'RESTRICTION_SKU_SKU_JCW_LIST_OFFSET_SIZE',
+                '#restriction_sku_sku_jcw_list',
+                '#restriction_sku_selected',
+                13,
+                'restriction_sku_brand_list',
+                'jcw'
+            );
+        } else if(value == 'append-search-sku-stt-list') {
+            $("#" + element +' option:selected').remove();           
+            searchBox(
+                'indirect',
+                $('#restriction_sku_selector_sku_stt_search').val(), 
+                "#dummy-loader", 
+                method, 
+                'RESTRICTION_SKU_SKU_STT_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_SKU_SKU_STT_LIST_SEARCH', 
+                'RESTRICTION_SKU_SKU_STT_LIST_OFFSET_SIZE',
+                '#restriction_sku_sku_stt_list',
+                '#restriction_sku_selected',
+                13,
+                'restriction_sku_brand_list',
+                'stt'
+            );
+        } else {
+            return false;
+        }
+    }
+    
+    function skuList(elementBrandId, valueBrand) {
+        
+        var value = trimValue(valueBrand);
+
+        if(value == 'append') {
+            
+            var objElementSkuBrand = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_BRAND_LIST_OFFSET_SIZE');
+            if(objElementSkuBrand != false) {
+                 $("#" + elementBrandId +' option:selected').remove();
+                 loadElement("#dummy-loader", 
+                    "/dcms/template/brandlist", 
+                    "post", 
+                    {offset:objElementSkuBrand.elvalue,pagesize:pagesize, element:"#" + elementBrandId, selected:getAllSelectedValues('#restriction_sku_selected')}, 
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    "#"+elementBrandId
+                );
+                offsetHash[objElementSkuBrand.elm] = objElementSkuBrand.elvalue + pagesize;
+            }            
+        } else if (value == 'append-search-sku-brand-list') {
+            $("#" + elementBrandId +' option:selected').remove();
+            searchBox(
+                'indirect',
+                $('#restriction_sku_selector_brand_search').val(), 
+                "#dummy-loader", 
+                'brandlist', 
+                'RESTRICTION_SKU_BRAND_LIST_SEARCH_OFFSET_SIZE', 
+                'RESTRICTION_SKU_BRAND_LIST_SEARCH', 
+                'RESTRICTION_SKU_BRAND_LIST_OFFSET_SIZE',
+                "#" + elementBrandId,
+                '#restriction_sku_selected'
+            );
+        } else {
+            
+            var objElementSearchOffsetUsap = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_SKU_USAP_LIST_SEARCH_OFFSET_SIZE');
+                offsetHash[objElementSearchOffsetUsap.elm] = 0;
+            var objElementSearchHashUsap = getObjectElementValue(searchHash, 'RESTRICTION_SKU_SKU_USAP_LIST_SEARCH');
+                searchHash[objElementSearchHashUsap.elm] = "search";
+            var objElementUsap = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_SKU_USAP_LIST_OFFSET_SIZE');
+                offsetHash[objElementUsap.elm] = 0;
+
+            var objElementSearchOffsetJcw = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_SKU_JCW_LIST_SEARCH_OFFSET_SIZE');
+                offsetHash[objElementSearchOffsetJcw.elm] = 0;
+            var objElementSearchHashJcw = getObjectElementValue(searchHash, 'RESTRICTION_SKU_SKU_JCW_LIST_SEARCH');
+                searchHash[objElementSearchHashJcw.elm] = "search";
+            var objElementJcw = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_SKU_JCW_LIST_OFFSET_SIZE');
+                offsetHash[objElementJcw.elm] = 0;
+                
+            var objElementSearchOffsetStt = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_SKU_STT_LIST_SEARCH_OFFSET_SIZE');
+                offsetHash[objElementSearchOffsetStt.elm] = 0;
+            var objElementSearchHashStt = getObjectElementValue(searchHash, 'RESTRICTION_SKU_SKU_STT_LIST_SEARCH');
+                searchHash[objElementSearchHashStt.elm] = "search";
+            var objElementStt = getObjectElementValue(offsetHash, 'RESTRICTION_SKU_SKU_STT_LIST_OFFSET_SIZE');
+                offsetHash[objElementStt.elm] = 0;               
+
+            if(objElementUsap != false && objElementJcw != false && objElementStt != false) {
+                $('#restriction_sku_sku_usap_list').empty();
+                $('#restriction_sku_sku_jcw_list').empty();
+                $('#restriction_sku_sku_stt_list').empty();
+                
+                loadElement("#dummy-loader", 
+                    "/dcms/template/brandskulist", 
+                    "post", 
+                    {
+                        offset:{usap:offsetHash[objElementUsap.elm], jcw:offsetHash[objElementJcw.elm], stt:offsetHash[objElementStt.elm]}, 
+                        pagesize:pagesize, 
+                        element:{usap:'#restriction_sku_sku_usap_list', jcw:'#restriction_sku_sku_jcw_list', stt:'#restriction_sku_sku_stt_list'},
+                        selected:getAllSelectedValues('#restriction_sku_selected'),
+                        post:value
+                    },
+                    null, 
+                    MESSAGE_LOADING, 
+                    'html',
+                    "#"+elementBrandId
+                );
+                offsetHash[objElementUsap.elm] = pagesize;
+                offsetHash[objElementJcw.elm] = pagesize;
+                offsetHash[objElementStt.elm] = pagesize;
+            }
+            $('#restriction_sku_selector_sku_usap_search').val('');
+            $('#restriction_sku_selector_sku_jcw_search').val('');
+            $('#restriction_sku_selector_sku_stt_search').val('');
+
+        }
+        
+    }
+    
+    function populateSelected() {
+        
+        $("#restriction_part_selected, #restriction_brand_selected, #restriction_brand_part_selected, #restriction_part_brand_selected, #restriction_sku_selected").find('option').each(function() {
+            $(this).attr('selected', 'selected');
+        });   
+    }
+    
+    (function(){var g=function(a){if(a&&a.stopPropagation)a.stopPropagation();else window.event.cancelBubble=true;var b=a?a:window.event;b.preventDefault&&b.preventDefault()},d=function(a,c,b){if(a.addEventListener)a.addEventListener(c,b,false);else a.attachEvent&&a.attachEvent("on"+c,b)},a=function(c,a){var b=new RegExp("(^| )"+a+"( |$)");return b.test(c.className)?true:false},j=function(b,c,d){if(!a(b,c))if(b.className=="")b.className=c;else if(d)b.className=c+" "+b.className;else b.className+=" "+c},h=function(a,b){var c=new RegExp("(^| )"+b+"( |$)");a.className=a.className.replace(c,"$1");a.className=a.className.replace(/ $/,"")},e=function(){var b=window.location.pathname;if(b.indexOf("/")!=-1)b=b.split("/");var a=b[b.length-1]||"root";if(a.indexOf(".")!=-1)a=a.substring(0,a.indexOf("."));if(a>20)a=a.substring(a.length-19);return a},c="mi"+e(),b=function(b,a){this.g(b,a)};b.prototype={h:function(){var b=new RegExp(c+this.a+"=(\\d+)"),a=document.cookie.match(b);return a?a[1]:this.i()},i:function(){for(var b=0,c=this.b.length;b<c;b++)if(a(this.b[b].parentNode,"selected"))return b;return 0},j:function(b,d){var c=document.getElementById(b.TargetId);if(!c)return;this.l(c);for(var a=0;a<this.b.length;a++)if(this.b[a]==b){j(b.parentNode,"selected");d&&this.d&&this.k(this.a,a)}else h(this.b[a].parentNode,"selected")},k:function(a,b){document.cookie=c+a+"="+b+"; path=/"},l:function(b){for(var a=0;a<this.c.length;a++)this.c[a].style.display=this.c[a].id==b.id?"block":"none"},m:function(){this.c=[];for(var c=this,a=0;a<this.b.length;a++){var b=document.getElementById(this.b[a].TargetId);if(b){this.c.push(b);d(this.b[a],"click",function(b){var a=this;if(a===window)a=window.event.srcElement;c.j(a,1);g(b);return false})}}},g:function(f,h){this.a=h;this.b=[];for(var e=f.getElementsByTagName("a"),i=/#([^?]+)/,a,b,c=0;c<e.length;c++){b=e[c];a=b.getAttribute("href");if(a.indexOf("#")==-1)continue;else{var d=a.match(i);if(d){a=d[1];b.TargetId=a;this.b.push(b)}else continue}}var g=f.getAttribute("data-persist")||"";this.d=g.toLowerCase()=="true"?1:0;this.m();this.n()},n:function(){var a=this.d?parseInt(this.h()):this.i();if(a>=this.b.length)a=0;this.j(this.b[a],0)}};var k=[],i=function(e){var b=false;function a(){if(b)return;b=true;setTimeout(e,4)}if(document.addEventListener)document.addEventListener("DOMContentLoaded",a,false);else if(document.attachEvent){try{var f=window.frameElement!=null}catch(g){}if(document.documentElement.doScroll&&!f){function c(){if(b)return;try{document.documentElement.doScroll("left");a()}catch(d){setTimeout(c,10)}}c()}document.attachEvent("onreadystatechange",function(){document.readyState==="complete"&&a()})}d(window,"load",a)},f=function(){for(var d=document.getElementsByTagName("ul"),c=0,e=d.length;c<e;c++)a(d[c],"tabs")&&k.push(new b(d[c],c))};i(f);return{}})()
+
+    function clearTemplateName(){
+        //var templateNameByList = document.getElementById('template_name').value = ""; 
+        //var templateNameByUpload = document.getElementById('template_name_upload').value = ""; 
+    }
+
+    //$("#template_name").keyup(function()
+    //{
+    //    var templateNameByList = document.getElementById('template_name').value; 
+    //    var templateNameByUpload = document.getElementById('template_name_upload').value = templateNameByList; 
+    //});
+
+    //$("#template_name_upload").keyup(function()
+    //{
+    //    var templateNameByUpload = document.getElementById('template_name_upload').value;
+    //    var templateNameByList = document.getElementById('template_name').value = templateNameByUpload;     
+    //});
+</script>

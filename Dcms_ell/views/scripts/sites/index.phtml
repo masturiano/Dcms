@@ -1,0 +1,107 @@
+<style>
+.bg_btn{
+    background-color: #F6F6F6;
+    border-bottom: 5px solid #555555;
+    border-top: 5px solid #555555;
+    margin-top: 20px;
+    padding: 8px 10px;
+    text-align: right;
+}
+</style>
+<script>
+function filterRecords(){
+    var domainName = $("#domainName").val();    
+    var cleanDom = domainName.replace(/[^A-Za-z0-9.]/g, "");
+
+    location.href = '/dcms/sites/index/countperpage/<?php echo $this->request['countperpage']; ?>/page/<?php echo $this->request['page']; ?>/domainName/'+cleanDom;
+}
+
+function validateInputSearch(e) {
+    
+    var key;
+    var keychar;
+
+    if (window.event)
+        key = window.event.keyCode;
+    else if (e)
+        key = e.which;
+    else
+        return true;
+    keychar = String.fromCharCode(key);
+    keychar = keychar.toLowerCase();
+
+ // control keys
+    if ((key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27) ) {
+        return true;
+    }
+
+    if ((key >= 65 && key <= 90) || (key >=97 && key <= 122) || (key >= 48 && key <= 57)) {
+        return true;
+    }else {
+        return false;
+    }
+}
+
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <div class="messages">
+            <?php echo $this->flashMessages(); ?>
+        </div>         
+        <?php $pagevars = $this->paginator->getPages(); ?>
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponSearchTable">
+                    <tr>
+                        <td valign="top">
+                            Domain Name: <input type="text" id="domainName" onKeyUp="return validateInputSearch(event);" name="domainName" value="<?php if(isset($this->request['domainName'])){echo $this->request['domainName'];} ?>" />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="button" id="search_btn" name="search_btn" value="Filter" class="uniform" onclick="filterRecords();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <table width="100%" border="0" cellpadding="0" cellspacing="2" id="domainTable">
+            <tr>
+                <td colspan="5">
+                    <div class="pagination">
+                        <div class="page-info"><?php echo $pagevars->totalItemCount; ?></div>
+                        <?php echo $this->paginationControl($this->paginator, 'Sliding', '/partials/domainpaginationcontrols.phtml', array('request' => $this->request)); ?>
+                    </div>
+                </td>
+            </tr>
+            <tr style="background-color:#FFEBCD;">
+                <td width="10" style="text-align:center;"><div style="padding:5px;"><b>Site ID</b></div></td>
+                <td width="20"><div style="padding:5px;"><b>Site Domain</b></div></td>
+                <td width="10" style="text-align:center;"><div style="padding:5px;"><b>Channel Code</b></div></td>
+                <td width="10" style="text-align:center;"><div style="padding:5px;"><b>Acronym</b></div></td>
+                <td width="50" style="text-align:center;"><div style="padding:5px;"><b>Action</b></div></td>
+            </tr>
+
+            <?php
+            if (count($this->paginator)) {
+                echo $this->partialLoop('partials/domain.listing.phtml', $this->paginator);
+            }else{
+                echo '<tr>
+                    <td colspan="5"><center>No sites available</center></td>
+                </tr>
+                <tr>
+                    <td colspan="5">&nbsp;</td>
+                </tr>';
+            }
+            ?>
+
+            <tr>
+                <td colspan="5">
+                    <div class="pagination">
+                        <div class="page-info"><?php echo $pagevars->totalItemCount; ?></div>
+                        <?php echo $this->paginationControl($this->paginator, 'Sliding', '/partials/domainpaginationcontrols.phtml', array('request' => $this->request)); ?>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="bg_btn"><input type="button" value="Add New Site" name="site_add" onclick="location.href='/dcms/sites/addsite';" class="uniform" /></div>
+    </div>
+</div>

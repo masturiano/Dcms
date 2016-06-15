@@ -1,0 +1,119 @@
+<style>
+#main .pagination {
+    float: right;
+    text-align: right;
+    width: 620px;
+}
+
+.pagination a {
+    color: #FFFFFF !important;
+}
+
+.pagination .disabled a {
+    color: #737373 !important;
+}
+</style>
+<script>
+function filterRecords(){
+    var batchId = $("#batchId").val();
+    var siteId  = $("#siteId").val();
+    
+    location.href = '/dcms/coupon/otucouponsecondary/countperpage/<?php echo $this->request['countperpage']; ?>/page/<?php echo $this->request['page']; ?>/siteId/'+siteId+'/batch_id/'+batchId;
+}
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.guest.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="searchcoupon_id" name="searchcoupon" class="datasearchform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <div id="coupon-name">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponSearchTable">
+                    <tr>
+                        <td valign="top">
+                            Batch Name: <input type="text" id="batchId" name="batchId" value="<?php if(isset($this->request['batch_id'])){echo $this->request['batch_id'];} ?>" />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            Sites: <select id="siteId" name="siteId">
+                                <option value="">All</option>
+                                <?php
+                                $rec = $this->readsites;
+                                $t = count($rec);
+
+                                if(trim($t)){
+                                    for($i=0; $i<$t; $i++){
+                                        $optionpage1 = "<option value='{$rec[$i]['siteId']}'";
+                                        ($this->request['siteId'] == $rec[$i]['siteId']) ? $optionpage1 .= " selected='selected'" : "";
+                                        $optionpage1 .= ">{$rec[$i]['name']}</option>";
+                                        echo $optionpage1;
+                                    }
+                                }
+                                ?>
+                            </select>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="button" id="search_btn" name="search_btn" value="Filter" class="uniform" onclick="filterRecords();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="apply-coupon" style="overflow:auto;">
+                <div>&nbsp;</div>
+                <div>
+                    Coupon per page: 
+                    <select name="countperpage" onchange="location.href='/dcms/coupon/otucouponsecondary/countperpage/'+this.value+'/page/<?php echo $this->request['page']; ?>/siteId/<?php echo $this->request['siteId']; ?>/batch_id/<?php echo $this->request['batch_id']; ?>';">
+                        <?php
+                        $pagecount = 10;
+                        for ($counter = 1; $counter <= 10; $counter++, $pagecount += 10) {
+                            $optionpage = "<option value='{$pagecount}'";
+                            ($this->request['countperpage'] == $pagecount) ? $optionpage .= " selected='selected'" : "";
+                            $optionpage .= ">{$pagecount}</option>";
+                            echo $optionpage;
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div>&nbsp;</div>
+                <?php $pagevars = $this->paginator->getPages(); ?>
+                <table width="100%" border="0" cellpadding="0" cellspacing="2" id="domainTable">
+                    <tr>
+                        <td colspan="6">
+                            <div class="pagination">
+                                <div class="page-info"><?php echo $pagevars->totalItemCount; ?></div>
+                                <?php echo $this->paginationControl($this->paginator, 'Sliding', '/partials/otucouponsecondarypaginationcontrols.phtml', array('request' => $this->request)); ?>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr style="background-color:#FFEBCD;">
+                        <td width="160"><div style="padding:5px;"><b>Coupon Code</b></div></td>
+                        <td width="80" style="text-align:center;"><div style="padding:5px;"><b>Date Created</b></div></td>
+                        <td width="80" style="text-align:center;"><div style="padding:5px;"><b>Template</b></div></td>
+                        <td width="40" style="text-align:center;"><div style="padding:5px;"><b>Site</b></div></td>
+                        <td width="130" style="text-align:center;"><div style="padding:5px;"><b>Time Frame</b></div></td>
+                        <td style="text-align:center;"><div style="padding:5px;"><b>Owner</b></div></td>
+                    </tr>
+
+                    <?php
+                    if (count($this->paginator)) {
+                        echo $this->partialLoop('partials/otucouponsecondary.listing.phtml', $this->paginator);
+                    }else{
+                        echo '<tr>
+                            <td colspan="6"><center>No OTU coupon available</center></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">&nbsp;</td>
+                        </tr>';
+                    }
+                    ?>
+
+                    <tr>
+                        <td colspan="6">
+                            <div class="pagination">
+                                <div class="page-info"><?php echo $pagevars->totalItemCount; ?></div>
+                                <?php echo $this->paginationControl($this->paginator, 'Sliding', '/partials/otucouponsecondarypaginationcontrols.phtml', array('request' => $this->request)); ?>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>

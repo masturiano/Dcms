@@ -1,0 +1,75 @@
+<style>
+    #coupon ul{
+        padding:0; 
+        margin: 0;
+        clear: both;
+    }
+    #coupon li{
+        padding: 2px;
+        list-style: none;
+        float: left;
+        display: block;
+        margin-right: 10px;
+    }
+    #coupon label{
+        display: inline-block;
+    }
+    .clearfix:after {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        height: 0;
+    }
+
+    .clearfix {
+        display: inline-block;
+    }
+
+    html[xmlns] .clearfix {
+        display: block;
+    }
+
+    * html .clearfix {
+        height: 1%;
+    }
+
+    .bluebackground {
+        background:#f5f8fc; 
+        border: solid 1px #b2b7d5; 
+    }
+    .labelblock{
+        display: block;
+    }
+
+    .ceil{
+        width: 30px;
+    }
+    .radiopadding{
+        padding: 10px;
+    }
+</style>
+<div id="main">
+    <form action="<?php echo $this->escape($this->form->getAction()); ?>"
+          method="<?php echo $this->escape($this->form->getMethod()); ?>">
+              <?php echo $this->form->getDisplayGroup('coupons1'); ?>
+        <b> Apply Coupon to: </b>
+        <?php echo $this->form->getDisplayGroup('coupons2'); ?>
+        <?php echo $this->form->getDisplayGroup('coupons3'); ?>
+        <b> Expiration:</b>
+        <?php echo $this->form->getDisplayGroup('coupons4'); ?>
+
+        <div id="include-exclude">
+        <div style="clear: both;"></div>
+        <ul class="tab">
+            <li class="active" style="">
+                <a href="#tab1">
+                    <b>Restrictions</b>
+                </a>
+            </li>
+        </ul>
+        
+        <?php echo $this->form->getDisplayGroup('coupons5'); ?>
+        </div>
+</div>

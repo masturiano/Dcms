@@ -1,0 +1,12 @@
+<?php
+
+$view = Zend_Registry::get('view');
+$__row_style = (($this->partialCounter % 2 ) ? "#E8E8E8" : "#F7F7F7");
+echo '<tr style="background-color:'.$__row_style.';">
+    <td><div style="padding:5px;">' . $this->owner . '</div></td>';
+if (!isset($view->readonly) || $view->readonly == false) {
+echo '
+    <td style="text-align:center;"><div style="padding:5px;"><a href="/dcms/couponowners/updateowner/id/' . $this->id . '">edit</a> | <a href="/dcms/couponowners/deleteowner/id/' . $this->id . '"  onClick="return confirm(\'Are you sure you want to DELETE Owner ' . $this->owner . '?\')">delete</a></div></td>
+</tr>';
+}
+?>

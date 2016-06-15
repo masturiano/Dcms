@@ -1,0 +1,13 @@
+<?php
+if($_GET['action']=='checkotucouponname'){
+    echo count($this->readotucoupon);
+
+    return;
+}else if($_GET['action']=='getchannelcodestoadd'){
+    $channelCode = $this->otucouponaddform->getElement('channelCode');
+    
+    echo $channelCode->getLabel()." ".$channelCode;
+    
+    return;
+}
+?>

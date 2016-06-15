@@ -1,0 +1,37 @@
+{
+	"_id" : ObjectId("573e810b8a1ee8aa2b000010"),
+	"templateName" : "MYDEL_TEST",
+	"type" : "exclude",
+	"brands" : [
+		"2 Wheel Tunes"
+	],
+	"parts" : [
+		"12 Point Bit"
+	],
+	"brandPart" : {
+		"2 Wheel Tunes" : [
+			"Accessory Mounting Kit"
+		]
+	},
+	"partBrand" : {
+		"2 Way Radio Mount" : [
+			"ARB"
+		]
+	},
+	"brandSku" : {
+		"usap" : {
+			"2 Wheel Tunes" : [
+				"2WT44050024"
+			]
+		},
+		"jcw" : {
+			"2 Wheel Tunes" : [
+				"957556"
+			]
+		}
+	},
+	"creator" : "masturiano",
+	"modified" : true,
+	"createdAt" : ISODate("2016-05-20T03:14:19Z"),
+	"templateId" : NumberLong(100039)
+}

@@ -1,0 +1,618 @@
+<style>
+.bg_btn{
+    background-color: #F6F6F6;
+    border-bottom: 5px solid #555555;
+    border-top: 5px solid #555555;
+    margin-top: 20px;
+    padding: 8px 10px;
+    text-align: right;
+}
+</style>
+<?php
+echo $this->headLink()->prependStylesheet('/assets/css/coupon.css');
+
+$name        = $this->domainaddform->getElement('name');
+$channelCode = $this->domainaddform->getElement('channelCode');
+$serverName  = $this->domainaddform->getElement('serverName');
+$plus        = $this->domainaddform->getElement('plus');
+$minus       = $this->domainaddform->getElement('minus');
+$hidden      = $this->domainaddform->getElement('last_coupon_field_id');
+$acronym     = $this->domainaddform->getElement('acronym');
+$isUsapSite  = $this->domainaddform->getElement('isUsapSite');
+$cancel      = $this->domainaddform->getElement('cancel');
+$domain_add  = $this->domainaddform->getElement('domain_add');
+?>
+<script type="text/javascript">
+if(typeof String.prototype.trim !== 'function') {   String.prototype.trim = function() {     return this.replace(/^\s+|\s+$/g, '');    } }
+
+var name = {};
+name.id = "<?php echo $name->getId(); ?>";
+name.label = "<?php echo $name->getLabel(); ?>";
+
+var channelCode = {};
+channelCode.id = "<?php echo $channelCode->getId(); ?>";
+channelCode.label = "<?php echo $channelCode->getLabel(); ?>";
+
+var serverName = {};
+serverName.id = "<?php echo $serverName->getId(); ?>";
+serverName.label = "<?php echo $serverName->getLabel(); ?>";
+
+var acronym = {};
+acronym.id = "<?php echo $acronym->getId(); ?>";
+acronym.label = "<?php echo $acronym->getLabel(); ?>";
+
+var errorHandler = {};
+    errorHandler.NOT_EMPTY = "should not be empty";
+    errorHandler.NUMBER_NOT_GREATER_THAN = "should not be greater than";
+    errorHandler.NUMBER_NOT_EQUAL = "should not be equal";
+    errorHandler.IS_NUMERIC = "should be numeric";
+    errorHandler.INVALID_DATE_NOT_EQUAL = "Dates should not be equal";
+    errorHandler.DOMAIN_EXISTS = "Domain with this name already exists";
+    errorHandler.CHANNELCODE_EXISTS = "Channel Code with this ID already exists";
+    errorHandler.CHANNELCODE_THESAME = "Channel Code cannot be the same";
+    errorHandler.SERVERNAME_EXISTS = "Server with this name already exists";
+    errorHandler.SERVERNAME_THESAME = "Server name cannot be the same";
+    errorHandler.ACRONYM_EXISTS = "Acronym with this name already exists";
+    errorHandler.NOT_VALID_DOMAIN = "Domain name is not valid";
+    errorHandler.HAS_WHITE_SPACE = "Value has a white space";
+    errorHandler.HAS_NON_ALPHANUMERIC = "Not valid. Please input alphanumeric value only";  
+    errorHandler.API_ERROR = "An error occured while requesting on API";
+    errorHandler.HAS_LESS_THAN_TWO = "Acronym should have at least 2 characters";
+
+var intRegex = /^\d+$/;
+var floatRegex = /^((\d+(\.\d *)?)|((\d*\.)?\d+))$/;
+var domainRegex = /^[a-zA-Z0-9-.]+(.com|.in|.co|.info|.name|.net|.org)$/;
+var letterRegex = /^[A-Za-z0-9]+$/;
+
+function cleanSpace(inputValue) {
+    return inputValue.split(' ').join('');
+}
+
+function hasWhiteSpace(value) {
+    return /\s/g.test(value);
+}
+
+function letternumber(e, checkType)
+{
+    var key;
+    var keychar;
+
+    if (window.event)
+        key = window.event.keyCode;
+    else if (e)
+        key = e.which;
+    else
+        return true;
+    keychar = String.fromCharCode(key);
+    keychar = keychar.toLowerCase();
+
+    // control keys
+    if ((key==null) || (key==0) || (key==8) || (key==9) || (key==13) || (key==27) ) {
+        return true;
+    }
+
+    if(checkType == 'number') {
+        if(key >= 48 && key <= 57){
+            return true;
+        }else{
+            return false;
+        }
+    } else if(checkType == 'letter') {
+        if ((key >= 65 && key <= 90) || (key >=97 && key <= 122)) {
+            return true;
+        }else {
+            return false;
+        }
+    } else {
+        if ((key >= 65 && key <= 90) || (key >=97 && key <= 122) || (key >= 48 && key <= 57)) {
+            return true;
+        }else {
+            return false;
+        }
+    }        
+}
+
+
+function validateForm(){
+    var countError = 0;
+    
+    var nameCounter = 0;
+    $('input[name^="'+name.id+'"]').each(function(){
+        var inputValue = $.trim($(this).val());
+        $(this).val(inputValue);          
+        
+        if(inputValue == ""){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(name.label + " " + errorHandler.NOT_EMPTY);
+            countError++;
+            nameCounter++;
+        } else if(hasWhiteSpace(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_WHITE_SPACE + ": " + inputValue);
+            countError++;
+            nameCounter++;
+        } else if(!domainRegex.test(inputValue)){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.NOT_VALID_DOMAIN + ": " + inputValue);
+            countError++;
+            nameCounter++;
+        } else{
+            if(nameCounter==0){
+                nameCounter = hasDomain(name);
+                if(nameCounter==0){
+                    $(this).removeClass('errorFocus');
+                    $('.'+this.id).html("");
+                }
+            }
+        }
+        countError += nameCounter;
+    });
+    
+    var channelCodeCounter = 0;
+    var rcc = new Array();
+    var icc = 0;
+    $('input[name^="'+channelCode.id+'"]').each(function(){
+        var inputValue = $.trim($(this).val());
+        $(this).val(inputValue);
+
+        if(inputValue == ""){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(channelCode.label + " " + errorHandler.NOT_EMPTY);
+            countError++;
+            channelCodeCounter++;
+        } else if(hasWhiteSpace(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_WHITE_SPACE + ": " + inputValue);
+            countError++;
+            channelCodeCounter++;
+        } else if(!intRegex.test(inputValue) || !floatRegex.test(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(channelCode.label + " " + errorHandler.IS_NUMERIC);
+            countError++;
+            channelCodeCounter++;
+        } else if(jQuery.inArray(inputValue, rcc)!="-1"){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.CHANNELCODE_THESAME + ": " + inputValue);
+            countError++;
+            channelCodeCounter++;
+        }else{
+            rcc[icc] = $(this).val();
+            
+            if(channelCodeCounter==0){
+                channelCodeCounter = hasChannelCode(channelCode);
+                if(channelCodeCounter==0){
+                    $(this).removeClass('errorFocus');
+                    $('.'+this.id).html("");
+                }
+            }
+        }
+        countError += channelCodeCounter;
+        
+        icc++;
+    });
+    
+    var serverNameCounter = 0;
+    var rsn = new Array();
+    var isn = 0;
+    $('input[name^="'+serverName.id+'"]').each(function(){
+        var inputValue = $.trim($(this).val());
+        $(this).val(inputValue);
+        
+        if(inputValue == ""){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(serverName.label + " " + errorHandler.NOT_EMPTY);
+            countError++;
+            serverNameCounter++;
+        } else if(hasWhiteSpace(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_WHITE_SPACE + ": " + inputValue);
+            countError++;
+            serverNameCounter++;
+        } else if(!domainRegex.test(inputValue)){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.NOT_VALID_DOMAIN + ": " + inputValue);
+            countError++;
+            serverNameCounter++;
+        } else if(jQuery.inArray(inputValue, rsn)!="-1"){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.SERVERNAME_THESAME + ": " + inputValue);
+            countError++;
+            serverNameCounter++;
+        } else{
+            rsn[isn] = $(this).val();
+            
+            if(serverNameCounter==0){
+                serverNameCounter = hasServerName(serverName);
+                if(serverNameCounter==0){
+                    $(this).removeClass('errorFocus');
+                    $('.'+this.id).html("");
+                }
+            }
+        }
+        countError += serverNameCounter;
+        
+        isn++;
+    });
+    
+    var acronymCounter = 0;
+    $('input[name^="'+acronym.id+'"]').each(function(){
+        var inputValue = $.trim($(this).val());
+        $(this).val(inputValue);
+        
+        if(inputValue == ""){
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(acronym.label + " " + errorHandler.NOT_EMPTY);
+            countError++;
+            acronymCounter++;
+        } else if(hasWhiteSpace(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_WHITE_SPACE + ": " + inputValue);
+            countError++;
+            acronymCounter++;
+        } else if(!letterRegex.test(inputValue)) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_NON_ALPHANUMERIC + ": " + inputValue);
+            countError++;
+            acronymCounter++;
+        } else if(inputValue.length < 2) {
+            $(this).addClass('errorFocus');
+            $('.'+this.id).html(errorHandler.HAS_LESS_THAN_TWO + ": " + inputValue);
+            countError++;
+            acronymCounter++;
+        } else{
+            if(acronymCounter==0){
+                acronymCounter = hasAcronym(acronym);
+                if(acronymCounter==0){
+                    $(this).removeClass('errorFocus');
+                    $('.'+this.id).html("");
+                }
+            }
+        }
+        countError += acronymCounter;
+    });
+
+    if(countError>0){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+function hasDomain(){
+    var inputData = $("#"+name.id).val();
+    var errorCount = 0;
+    
+    jQuery.ajax({
+        url: "ajax/?action=checkdomain",
+        type: "GET",
+        data: jQuery("#adddomain_id").serialize(),
+        async: false,
+        
+        success: function(data){
+            
+            var dataDoc = $.trim(data.toString());
+            dataDoc = dataDoc.substring(0,15);
+            if(dataDoc == "<!DOCTYPE html>") {
+                //<!DOCTYPE html>
+                $('#'+name.id).addClass('errorFocus');
+                $('.'+name.id).html('An error occurred or your session might have expired already. <br /> Click here to <a href="">login</a>.');
+                errorCount++;
+            } else {
+                if(data>0){
+                    if(data == "error") {
+                        $('#'+name.id).addClass('errorFocus');
+                        $('.'+name.id).html(errorHandler.API_ERROR);
+                        errorCount++;
+                    } else {
+                        $('#'+name.id).addClass('errorFocus');
+                        $('.'+name.id).html(errorHandler.DOMAIN_EXISTS + ": " + inputData);
+                        errorCount++;
+                    }
+                }else{
+                    $('#'+name.id).removeClass('errorFocus');
+                    $('.'+name.id).html("");
+                }
+            }
+        }
+    });
+    
+    return errorCount;
+}
+
+function hasChannelCode(){
+    var inputData = $("#"+channelCode.id).val();
+    var errorCount = 0;
+    
+    jQuery.ajax({
+        url: "ajax/?action=checkchannelcode",
+        type: "GET",
+        data: jQuery("#adddomain_id").serialize(),
+        async: false,
+
+        success: function(data){
+
+            var dataDoc = $.trim(data.toString());
+            dataDoc = dataDoc.substring(0,15);
+            if(dataDoc == "<!DOCTYPE html>") {
+                //<!DOCTYPE html>
+                $('#'+channelCode.id).addClass('errorFocus');
+                $('.'+channelCode.id).html('An error occurred or your session might <br /> have expired already. Click here to <a href="">login</a>.');
+                errorCount++;
+            } else {
+                if(data>0){
+                    if(data == "error") {
+                        $('#'+channelCode.id).addClass('errorFocus');
+                        $('.'+channelCode.id).html(errorHandler.API_ERROR);
+                        errorCount++;
+                    } else {
+                        $('#'+channelCode.id).addClass('errorFocus');
+                        $('.'+channelCode.id).html(errorHandler.CHANNELCODE_EXISTS + ": " + data);
+                        errorCount++;
+                    }
+                }else{
+                    $('#'+channelCode.id).removeClass('errorFocus');
+                    $('.'+channelCode.id).html("");
+                }
+            }
+        }
+    });
+    
+    return errorCount;
+}
+
+function hasServerName(){
+    var inputData = $("#"+serverName.id).val();
+    var errorCount = 0;
+    
+    jQuery.ajax({
+        url: "ajax/?action=checkservername",
+        type: "GET",
+        data: jQuery("#adddomain_id").serialize(),
+        async: false,
+
+        success: function(data){
+
+            var dataDoc = $.trim(data.toString());
+            dataDoc = dataDoc.substring(0,15);
+            if(dataDoc == "<!DOCTYPE html>") {
+                //<!DOCTYPE html>
+                $('#'+serverName.id).addClass('errorFocus');
+                $('.'+serverName.id).html('An error occurred or your session might <br /> have expired already. Click here to <a href="">login</a>.');
+                errorCount++;
+            } else {
+                if(data!="" && data!=0){
+                    if(data == "error") {
+                        $('#'+serverName.id).addClass('errorFocus');
+                        $('.'+serverName.id).html(errorHandler.API_ERROR);
+                        errorCount++;
+                    } else {
+                        $('#'+serverName.id).addClass('errorFocus');
+                        $('.'+serverName.id).html(errorHandler.SERVERNAME_EXISTS + ": " + data);
+                        errorCount++;
+                    }
+                }else{
+                    $('#'+serverName.id).removeClass('errorFocus');
+                    $('.'+serverName.id).html("");
+                }
+            }
+        }
+    });
+    
+    return errorCount;
+}
+
+function hasAcronym(){
+    var inputData = $("#"+acronym.id).val();
+    var errorCount = 0;
+    
+    jQuery.ajax({
+        url: "ajax/?action=checkacronym",
+        type: "GET",
+        data: jQuery("#adddomain_id").serialize(),
+        async: false,
+
+        success: function(data){
+ 
+            var dataDoc = $.trim(data.toString());
+            dataDoc = dataDoc.substring(0,15);
+            if(dataDoc == "<!DOCTYPE html>") {
+                //<!DOCTYPE html>
+                $('#'+acronym.id).addClass('errorFocus');
+                $('.'+acronym.id).html('An error occurred or your session might have expired already. Click here to <a href="">login</a>.');
+                errorCount++;
+            } else {
+                if(data>0){
+                    if(data == "error") {
+                        $('#'+acronym.id).addClass('errorFocus');
+                        $('.'+acronym.id).html(errorHandler.API_ERROR);
+                        errorCount++;
+                    } else {
+                        $('#'+acronym.id).addClass('errorFocus');
+                        $('.'+acronym.id).html(errorHandler.ACRONYM_EXISTS + ": " + inputData);
+                        errorCount++;
+                    }
+                }else{
+                    $('#'+acronym.id).removeClass('errorFocus');
+                    $('.'+acronym.id).html("");
+                }
+            }
+        }
+    });
+    
+    return errorCount;
+}
+
+function checkIfEmpty(input, append){
+    var append = (append == null) ? "" : append;
+    var inputValue = $(append+'#'+input.id).val();
+    if(inputValue == ""){
+        $(append+'#'+input.id).addClass('errorFocus');
+        $(append+'.'+input.id).html(input.label + " " + errorHandler.NOT_EMPTY);
+        return 1;
+    }else{
+        $(append+'#'+input.id).removeClass('errorFocus');
+        $(append+'.'+input.id).html("");
+        return 0;
+    }
+}
+
+function bc_SplitTableRow(theLink) {
+
+    var emptyCounter = 0;
+    
+    $("#"+channelCode.id+", #"+serverName.id).each(function(){
+        if(this.value.trim() == "") {
+            emptyCounter++;
+        }
+    });
+    
+    if(emptyCounter == 0) {
+        var table = document.getElementById("domainTable2");
+
+        if(table.rows.length == 30){ 
+            return false;
+        }
+
+        theRow   = theLink.parentNode.parentNode;
+        theBod   = theRow.parentNode;
+        theTable = theRow.parentNode;
+        newRow   = theRow.cloneNode(true);
+
+        try{
+            new_id = Number(jQuery('#last_domain_field_id').val())+1;
+            $('#'+channelCode.id, newRow).val("");
+            $('#'+serverName.id, newRow).val("");
+            jQuery('#last_domain_field_id').val(new_id);
+
+            theBod.appendChild(newRow);
+        }catch(error){
+            alert(error);
+        }
+    }
+    return false;
+}
+
+function deleteRow(i){
+    var table = document.getElementById("domainTable2");
+    if(table.rows.length == 3){
+        alert('Cannot delete all channel code / server name');
+    } else if(i == 1){
+        return false;
+    }
+    else{
+        document.getElementById('domainTable2').deleteRow(i);
+    }
+}
+
+function checkNumber(val) {
+    var strPass = val.value;
+    var strLength = strPass.length;
+    var lchar = val.value.charAt((strLength) - 1);
+    var cCode = CalcKeyCode(lchar);
+
+    if ((cCode < 48 || cCode > 57) && cCode != 46) {
+        var myNumber = val.value.substring(0, (strLength) - 1);
+        val.value = myNumber;
+    }
+    return false;
+}
+
+function CalcKeyCode(aChar) {
+    var character = aChar.substring(0,1);
+    var code = aChar.charCodeAt(0);
+    return code;
+}
+</script>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <form id="adddomain_id" name="adddomain" class="dataform" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div id="main">
+            <table width="615" border="0" cellpadding="0" cellspacing="0" id="domainTable1">
+                <tbody>
+<?php                    
+/*
+                    <tr>
+                        <td><b><?php echo $siteId->getLabel(); ?></b></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><?php echo $siteId; ?></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><div class="error <?php echo $siteId->getId(); ?>"></div></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+ * */
+?>                    
+                    <tr>
+                        <td><b><?php echo $name->getLabel(); ?></b></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><?php echo $name; ?></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><div class="error <?php echo $name->getId(); ?>"></div></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="coupon-name">
+            <table width="100%" border="0" cellpadding="0" cellspacing="5" id="domainTable2">
+                <tbody>
+                    <tr>
+                        <td><b><?php echo $channelCode->getLabel(); ?></b></td>
+                        <td><b><?php echo $serverName->getLabel(); ?></b></td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td valign="top" width="45%"><?php echo $channelCode; ?></td>
+                        <td valign="top" width="45%"><?php echo $serverName; ?></td>
+                        <td width="5%" align="center"><?php echo $plus; ?></td>
+                        <td width="5%" align="center"><?php echo $minus; ?></td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td valign="top"><div class="error <?php echo $channelCode->getId(); ?>"></div></td>
+                        <td valign="top"><div class="error <?php echo $serverName->getId(); ?>"></div></td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            <table width="615" border="0" cellpadding="0" cellspacing="0" id="domainTable3">
+                <tbody>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><b><?php echo $acronym->getLabel(); ?></b></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><?php echo $acronym; ?></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><div class="error <?php echo $acronym->getId(); ?>"></div></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><b><?php echo $isUsapSite." ".$isUsapSite->getLabel(); ?></b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="bg_btn"><?php echo $cancel.' '.$domain_add; ?></div>
+        </form>
+    </div>
+</div>
+<?php echo $hidden; ?>

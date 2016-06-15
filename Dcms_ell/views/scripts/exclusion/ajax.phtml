@@ -1,0 +1,49 @@
+<script>
+$(".multiselect").multiselect();
+$('.search').keyup(function(e){
+    if(e.keyCode == 13) {
+        if(this.value.length>=2){
+            getExclusions(this.value);
+        }else{
+            alert("Please enter at least 2 characters in the text field.");
+        }
+    }
+});
+</script>
+<?php
+if($_GET['action']=='getexclusions'){
+    echo '<table width="100%" border="0" cellpadding="0" cellspacing="0" id="couponTable">
+        <tr>
+            <td width="60%">Master Excluded Brands for '.$this->readcurrentsite[0]['name'].'</td>
+            <td width="40%">List of Brands</td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <select id="brands" class="multiselect" multiple="multiple" name="brands[]" style="width:95%; height:300px;">';
+    
+                    $brandssitesrec = $this->readbrandssites[0]['brands'];
+                    $brandsrec      = $this->readbrands;
+
+                    $tbs = count($brandssitesrec);
+                    $tb  = count($brandsrec);
+
+                    if(trim($tbs)){
+                        for($ibs=0; $ibs<$tbs; $ibs++){
+                            echo '<option value="'.$brandssitesrec[$ibs].'" selected="selected">'.$brandssitesrec[$ibs].'</option>';
+                        }
+                    }
+
+                    if(trim($tb)){
+                        for($ib=0; $ib<$tb; $ib++){
+                            if(!in_array($brandsrec[$ib]['brand_name'], $brandssitesrec) && $brandsrec[$ib]['brand_name']!=""){
+                                echo '<option value="'.$brandsrec[$ib]['brand_name'].'">'.$brandsrec[$ib]['brand_name'].'</option>';
+                            }
+                        }
+                    }
+
+                echo '</select>
+            </td>
+        </tr>
+    </table>';
+}
+?>

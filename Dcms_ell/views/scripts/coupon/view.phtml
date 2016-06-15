@@ -1,0 +1,143 @@
+<?php
+//echo $this->headLink()->prependStylesheet('/assets/css/coupon.css');
+$key = rand(0, 9999);
+$this->headScript()->appendFile("/assets/js/jquery/functions.js?q=" . $key);
+?>
+<div class="container">
+    <?php echo $this->partial('partials/tabs.guest.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+        <div id="main">
+
+            <?php echo $this->title; ?> > <?php echo $this->user_action; ?>       
+            <br>
+            <br>
+                <div class="bluebackground">
+                    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="5" id="couponTable">
+                        <tbody><tr>
+                                <td width="30%">Coupon Name</td>
+
+                                <td width="15%">Type</td>
+                                <td width="15%">Value</td>
+                                <td width="15%">Qualifier</td>
+                                <td width="15%">Ceiling</td>
+                                <td width="5%">&nbsp;</td>
+                                <td width="5%">&nbsp;</td>
+                            </tr>
+
+                            <tr>
+                                <td valign="top">
+                                    <b><?php echo $this->coupon['name']; ?></b>                                
+                                </td>
+                                <td valign="top">
+                                    <b><?php echo isset($this->coupon['type']) ? $this->coupon['type'] : "" ; ?></b>                                
+                                </td>
+
+                                <td valign="top">
+                                    <b><?php
+                                    if(isset($this->coupon['discountVal']) && count($this->coupon['discountVal'] > 0)){
+                                        foreach ($this->coupon['discountVal'] as $discountValue)
+                                            echo $discountValue . "<br>"; 
+                                    }   
+                                    
+                                     ?></b>
+                                </td>
+                                <td valign="top">
+                                    <b><?php 
+                                    if(isset($this->coupon['amountQualifier']) && count($this->coupon['amountQualifier'] > 0)){
+                                    foreach ($this->coupon['amountQualifier'] as $amountQualifier)
+                                            echo $amountQualifier . "<br>"; 
+                                    }
+                                    ?></b>
+                                </td>
+                                <td valign="top">
+                                    <b><?php echo isset($this->coupon['ceilingAmount']) ? $this->coupon['ceilingAmount'] : ""; ?></b> 
+                                </td>
+                                <td valign="top" align="center"></td>
+                                <td valign="top" align="center"></td>
+                            </tr>
+                        </tbody></table>
+
+
+                </div>
+                <br>
+                <ul id="coupon" class="clearfix ver2">
+                    <li><label for="class" class="optional">Apply Coupon to:</label>
+                        <b><?php echo $this->coupon['class']; ?></b></li>
+                    <li><label for="site" class="optional">Site:</label>
+                        <b><?php echo $this->coupon['domains'][0]; ?></b></li>
+                    <li><label for="couponAppliesTo" class="optional">Apply Discount to:</label>
+                        <b><?php echo $this->coupon['couponAppliesTo']; ?></b></li>
+                    <li><label for="owner" class="optional">Owner:</label>
+                        <b><?php echo $this->coupon['owner']; ?></b></li></ul>        
+
+                <label for="appeasement" class="optional">Appeasement?:</label>
+
+                <b><?php echo ($this->coupon['couponAppliesTo']) ? "yes" : "no"; ?></b>               
+                <br>
+                <br>
+                Expiration: <b><?php echo $this->expiration['coupontype']; ?></b>
+
+                <br>
+                <br>
+                <?php
+                 echo $this->base->setTimeframeMessage($this->expiration);
+                ?>
+
+
+                <br>
+                <br>
+                <?php
+                IF (isset($this->restrictions) && $this->restrictions != "") :
+                    ?>
+                    <div id="include-exclude">
+                        <div style="clear: both;"></div>
+                        <ul class="tab">
+                            <li>
+
+                                <a>
+                                    <b>Restrictions</b>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="lists">
+                            <div id="tab1" class="tab_content" style="float: left; display: block; ">
+                                <div id="left-variable">
+
+                                    <div style="width: 600px;"> 
+                                        <table cellpadding="0" cellspacing="10">
+                                            <tbody><tr>
+                                                    <td>Template restrictions: </td>
+                                                    <td>
+                                                    </td>
+
+                                                    <td><a style='cursor:pointer' href="/dcms/template/view/tid/<?php echo $this->templateId ?>" onclick='return popView(this, "viewTemplate");'><u><?php echo $this->restrictions ?></u></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody></table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div id="calendar"></div>
+                        <div id="save-list">
+                        </div>
+                    </div>
+                    <?php ENDIF ?>
+                <div id="coupon" >Published? 
+                    <?php
+                    echo "<b>" . ((isset($this->status) && $this->status == "published") ? "yes" : "no") . "</b>";
+                    ?>
+                </div>
+                <div style="float:right">
+                    Created by: <b><?php echo $this->creator;  ?></b> Date: <b><?php echo date("m/d/Y, h:i a",$this->createdAt['sec']); ?></b><br>
+                   <?php IF(isset($this->modified) && $this->modified) : ?>
+                    Modified by: <b><?php echo $this->modifiedby;  ?></b> Date: <b><?php echo date("m/d/Y, h:i a",$this->updatedAt['sec']); ?></b>
+                    <?php ENDIF ?>
+                </div>
+                <br />
+                <br />
+        </div>
+    </div>
+</div>

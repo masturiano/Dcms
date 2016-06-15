@@ -1,0 +1,177 @@
+<?php
+$items = $this->coupon;
+$templateId = isset($this->templateId) ? $this->templateId : "";
+$limit = $items['limit'];
+$skip = $items['skip'];
+?>
+
+<script>
+    var resultsContainer;
+    var limit = <?php echo $limit; ?>;
+    var templateId = "<?php echo $templateId; ?>";
+    var li_text = "";
+    var li_prev_skip = "";
+    var li_prev_text = "";
+    var coupon_search_btn_clicked = false;
+    var inputValid = true;
+    
+    jQuery(document).ready(function() {
+        jQuery('#mycarousel').jcarousel();
+        firstPageFocus();
+    });
+   
+
+    function openTemplate(link, windowName) {
+        if(document.getElementById('applyrestriction_checkbox').checked){
+        
+            var params;
+            params = 'width='+screen.width;
+            params += ', height='+screen.height;
+            params += ', top=0, left=0';
+            params += ', fullscreen=yes, scrollbars=yes';
+            window.open(link, windowName, params);
+        }
+        return false;
+        
+    }
+    
+    
+    function setClicked(clicked){
+        coupon_search_btn_clicked = clicked;
+    }
+    
+    
+    function hasSpecialChar(input){
+        var iChars = "!@#$%^&*()+=-[]\\\';,./{}|\":<>?"; 
+        for (var i = 0; i < input.length; i++) {
+            if (iChars.indexOf(input.charAt(i)) != -1) {
+                return true;
+            }
+        }
+        return false;
+    }  
+    
+    
+    
+    function loadResults(skip){
+        resultsContainer = document.getElementById('couponDetails_container');
+        var couponSearchElement = document.getElementById('couponSearch');
+        var couponSearch = couponSearchElement.value;
+        var couponDetailsElement = document.getElementById("couponDetails");
+
+        if(coupon_search_btn_clicked){
+            if(hasSpecialChar(couponSearch)){
+                inputValid = false;
+                couponSearchElement.value = "";
+            } else{
+                inputValid = true;
+            }
+        }else{
+            inputValid = true;
+        }
+                        
+        if(inputValid){
+            removeError(couponDetailsElement);
+            inputValid = true;
+            $.ajax({
+                url: "/dcms/coupon/coupons/format/html/templateId/"+templateId+"/couponSearch/"+encodeURIComponent(couponSearch.toString())+"/skip/"+skip+"/limit/"+limit+"?s="+Math.random(),
+                type: "GET",
+                success: function(response){
+                    if(response.substring(0,15).toString() == "<!DOCTYPE html>"){
+                        //<!DOCTYPE html>
+                        $("#error_couponDetails").html('<div style="color:red;">An error occurred or your session might have expired already. Click here to <a href="">login</a>.</div>');
+                    } else {
+                        if(response != ""){
+                            $("#couponDetails_list").html(response);
+                            if($('#couponsperpage tr').length <= 1){
+                                showError(couponDetailsElement, "Coupon not found.");
+                                document.getElementById('pages').style.display = 'none';
+                            }else{
+                                removeError(couponDetailsElement);
+                                var couponCount = $("#couponCount").val();
+                                if(coupon_search_btn_clicked){
+                                    coupon_search_btn_clicked = false;
+                                
+                                    $.ajax({
+                                        url: "/dcms/coupon/pages/format/html/count/"+couponCount+"/skip/"+skip+"/limit/"+limit+"?s="+Math.random(),
+                                        type: "GET",
+                                        success: function(data){
+                                            if(data.substring(0,15).toString() == "<!DOCTYPE html>"){
+                                                //<!DOCTYPE html>
+                                                $("#error_couponDetails").html('<div style="color:red;">An error occurred or your session might have expired already. Click here to <a href="">login</a>.</div>');
+                                            } else {
+                                                $( "#pages" ).html( data );
+                                                jQuery('#mycarousel').jcarousel();
+                                                firstPageFocus();
+                                            }
+                                        },
+                                        error: function(err){
+                                            resultsContainer.innerHTML += err;
+                                        }
+                                    });
+
+                                }
+
+                                li_text = $("#page"+skip+ " a").text();
+                                $("#page"+skip+ " a").remove();
+                                $("#page"+skip).html(li_text);
+                                document.getElementById('pages').style.display = 'block';
+
+                                $('#couponSearch').val(couponSearch);
+                            
+
+
+                                if(li_prev_skip != null && li_prev_skip != skip && li_prev_text != ""){
+                                    $("#page"+li_prev_skip).html("<a onclick='loadResults("+li_prev_skip+")' style='cursor:pointer'>"+li_prev_text+"</a>");
+                                }
+                                li_prev_skip =  skip;
+                                li_prev_text = li_text;
+                            }
+                                
+                            
+                            
+                            
+                            disableRestriction(false);
+                       
+                        }else{
+
+                        }
+                    }
+                },
+                error: function(err){
+                    resultsContainer.innerHTML += err;
+                }
+            });
+        
+        }else{
+            //input invalid
+            showError(couponSearchElement, errorHandler.SPECIAL_CHARS_NOT_ALLOWED);
+        }
+
+    }
+    
+    
+    function firstPageFocus(){
+        li_text = $("#page0 a").text();
+        li_prev_skip = 0;
+        li_prev_text = li_text;
+        $("#page0 a").remove();
+        $("#page0").html(li_text);
+    }
+    
+    
+	
+</script>
+<center>
+    <div id="couponDetails_container">
+        <div id="couponDetails_list">
+            <?php echo $this->partial('coupon/coupons.ajax.phtml', $items); ?>
+        </div>
+        <div id="pages">
+            <?php echo $this->partial('coupon/pages.ajax.phtml', $items); ?>
+        </div>
+
+    </div>
+    <div class="error couponDetails"> </div>
+    <div id="error_couponDetails"></div>
+</center>

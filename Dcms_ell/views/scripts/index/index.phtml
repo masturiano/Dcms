@@ -1,0 +1,136 @@
+<div class="container">
+    <?php echo $this->partial('partials/tabs.phtml', $this); ?>
+    <div class="tabbed-content content-tab">
+	 <div class="messages"> 
+         <?php echo $this->flashMessages(); ?> 
+         </div> 
+        <div id="main">
+            <div class="coupons-navi">
+                <form name="search" enctype="application/x-www-form-urlencoded" method="post">
+                    <table border="0">
+                        <tbody><tr>
+                                <td width="10%"><b>Site:</b></td>
+                                <td width="20%">
+                                    <span style="font-size: 12px; font-weight: 500;">
+                                        <select name="coupon.domains" onChange="document.search.submit();">
+                                            <?php
+                                            foreach ($this->site as $key => $value) {
+                                                $option = "<option value='{$key}' onclick='document.search.submit();'";
+                                                (isset($this->query['coupon.domains']) && $this->query['coupon.domains'] == $key) ? $option .= " selected='selected'" : "";
+                                                $option .= ">{$value}</option>";
+                                                echo $option;
+                                            }
+                                            ?>
+                                        </select>	
+                                    </span>
+                                </td>
+
+                                <td width="60%">
+                                    <table width="100%" border="0">
+                                        <tbody><tr>
+                                                <td width="5%">&nbsp;</td>
+                                                <td width="15%"><b>Coupon Type:</b></td>
+                                                <td width="20%"><span style="font-size: 12px; font-weight: 500;">
+                                                        <select name="expiration.type" onChange="document.search.submit();">
+                                                            <?php
+                                                            foreach ($this->expiration as $key => $value) {
+                                                                $option = "<option value='{$key}' onclick='document.search.submit();'";
+                                                                (isset($this->query['expiration.type']) && $this->query['expiration.type'] == $key) ? $option .= " selected='selected'" : "";
+                                                                $option .= ">{$value}</option>";
+                                                                echo $option;
+                                                            }
+                                                            ?>
+                                                        </select>	
+                                                    </span></td>
+                                            </tr>
+                                        </tbody></table>
+                                </td>
+                                <td width="5%"></td>
+                                <td width="5%"><span style="color: black; font-size: 10px; font-weight: 700;"></span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">Coupon per page: <select name="countperpage">
+                                        <?php
+                                        $pagecount = 10;
+                                        for ($counter = 1; $counter <= 10; $counter++, $pagecount += 10) {
+                                            $optionpage = "<option value='{$pagecount}'";
+                                            ($this->countperpage == $pagecount) ? $optionpage .= " selected='selected'" : "";
+                                            $optionpage .= ">{$pagecount}</option>";
+                                            echo $optionpage;
+                                        }
+                                        ?>
+                                    </select><td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </form>
+                <div style="color: blue; font-size: 14px; font-weight: 400;"></div>
+                <div class="results-no"><!-- 1-10 results out of 1,837 --></div>    
+            </div>
+            <br>
+            <div id="search"></div>
+        </div>
+        <div>
+            <?php $pagevars = $this->paginator->getPages(); ?>
+            <div class="pagination">
+                <div class="page-info">
+                    <?php echo $pagevars->totalItemCount; ?>
+                </div>
+
+                <?php
+                echo $this->paginationControl($this->paginator, 'Sliding', '/partials/paginationcontrols.phtml', array('request' => $this->request));
+                ?>
+            </div>
+
+            <table  class="datatable" width="100%">
+                <thead>
+                    <tr style="text-align: left;">
+                        <th width="2%"><input type="checkbox"></th>
+                        <th width="20%">
+							<a href="<?php echo $this->url(array_merge($this->request,array('sortby' => "coupon.name", 'sort' => (isset($this->sort) ? "1" : "-1"))), 'default'); ?>">
+							Coupon Name
+							</a>
+							</th>
+                        <th  width="10%">
+							<a href="<?php echo $this->url(array_merge($this->request,array('sortby' => "coupon.createdAt", 'sort' => (isset($this->sort) ? "1" : "-1"))), 'default'); ?>">
+						Date Created</th>
+							</a>
+                        <th  width="10%">Template</th>
+                        <th  width="5%">
+						<a href="<?php echo $this->url(array_merge($this->request,array('sortby' => "coupon.domains", 'sort' => (isset($this->sort) ? "1" : "-1"))), 'default'); ?>">
+						Site
+						</a>
+						</th>
+                        <th  width="20%">Time Frame</th>
+                        <th  width="5%">
+						<a href="<?php echo $this->url(array_merge($this->request,array('sortby' => "coupon.owner", 'sort' => (isset($this->sort) ? "1" : "-1"))), 'default'); ?>">
+						Owner
+						</a>
+						</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (count($this->paginator)) {
+                        echo $this->partialLoop('partials/coupon.listing.phtml', $this->paginator);
+                    }
+                    ?>
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+            <div class="pagination">
+                <div class="page-info">
+                    <?php echo $pagevars->totalItemCount; ?>
+                </div>
+
+                <?php
+                echo $this->paginationControl($this->paginator, 'Sliding', '/partials/paginationcontrols.phtml', array('request' => $this->request));
+                ?>
+            </div>
+
+        </div>
+    </div>
+</div>
